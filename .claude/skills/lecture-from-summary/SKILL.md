@@ -1,29 +1,28 @@
 ---
 name: lecture-from-summary
-description: Turn a lesson-summary PDF (e.g. A2.pdf, "Περίληψη μαθήματος: Α΄ κύκλος, μάθημα N") into the Greek reveal.js lecture deck for learn.heraklion-bridge.gr, and create the matching quiz if it does not exist yet. Use when the user gives a summary PDF and asks for the lecture/slides/notes ("γράψε μου το μάθημα", "lecture notes", "διαφάνειες") and/or the quiz of a lesson.
+description: Turn a bridge lesson-summary PDF (e.g. A3-BasicsBid-Summary.pdf, "Περίληψη μαθήματος…") into a numbered Greek unit for learn.heraklion-bridge.gr - a reveal.js lecture deck plus the matching quiz (created only if missing), wired into the site, checked by an automatic script and verified in the browser. Use when the user gives a summary PDF and asks for the lecture / slides / notes / quiz ("γράψε μου το μάθημα", "φτιάξε διαφάνειες και κουίζ", "import this lecture overview", "διαφάνειες", "κουίζ") for the students area.
 argument-hint: <path to summary PDF> [quiz exists | create quiz]
 ---
 
-# Lecture (and quiz) from a lesson-summary PDF
+# Unit (lecture + quiz) from a lesson-summary PDF
 
-The site is a plain static site (no build step). Everything is in Greek. A lesson N has up to two artifacts:
+The site is a plain static site (no build step). Everything is in Greek. A unit has up to two artifacts:
 
 | Artifact | Path | Reference to copy the style from |
 |---|---|---|
 | Slides | `lectures/<slug>/index.html` | `lectures/kanones-agoras/` or `lectures/epilogi-symvolaiou/` |
-| Quiz | `quiz/<slug>/{index.html,questions.js}` | `quiz/epilogi-symvolaiou/` (header comment of `quiz/mathima-1/questions.js` documents every field) |
+| Quiz | `quiz/<slug>/{index.html,questions.js}` | `quiz/epilogi-symvolaiou/` (header comment of `quiz/vasika-tou-mpritz/questions.js` documents every field) |
 
 "Lecture notes" in the user's words = the slide deck. Stay consistent with the existing decks and quizzes: read at least one existing deck in full before writing a new one.
 
 ## Naming: units, not lessons (request of the teacher who writes the summaries)
 
-The material must not be tied to lesson numbers, so that other instructors, other clubs and self-learners can use it as a series of *units* in any order. Therefore, **from lesson 3 on**:
+The material must not be tied to lesson numbers, so that other instructors, other clubs and self-learners can use it as a series of *units* in any order. Therefore, for **every unit**:
 
 - Title = the topic title of the summary (e.g. «Αρχές επιλογής συμβολαίου»), never «Μάθημα N» / «Α΄ κύκλος · Μάθημα N» (title slide, `<title>`, meta, headings, tiles, quiz page, quiz note, menu).
 - **Units are numbered `01`, `02`, `03`… in teaching order** (requested by the site owner, so students can see how each unit builds on the previous one), always written as «Ενότητα NN» (never «Μάθημα»): title slide `p.big` = «Ενότητα NN · <υπότιτλος>», `<title>` = «Ενότητα NN · <τίτλος> – Διαφάνειες …», quiz `<h1>`/`<title>` = «Κουίζ NN: <τίτλος>», tile kickers «Ενότητα NN · N διαφάνειες» / «Ενότητα NN · N ερωτήσεις», `next` labels «Κουίζ NN: …», last-slide buttons short «Κουίζ NN», «← Ενότητα NN», «Ενότητα NN →» (long labels make the slide overflow), and the «Τι χρειάζεσαι από πριν» slide links to the units it needs («ενότητα 01 «…»»). URL slugs stay topic names (no numbers). The next number = the highest existing unit + 1.
-- Slug = transliterated topic, e.g. `lectures/epilogi-symvolaiou/`, `quiz/epilogi-symvolaiou/`. (The first two units were renamed from `mathima-1`/`mathima-2` to `vasika-tou-mpritz`/`kanones-agoras`; the old addresses are redirect stubs in `lectures/mathima-N/` and `quiz/mathima-N/`. Never delete them: links to them were shared. The hidden quizzes `quiz/mathima-5` and `quiz/mathima-6` still have lesson-number slugs: rename them by topic, with a redirect stub, when they are published.)
+- Slug = transliterated topic, e.g. `lectures/epilogi-symvolaiou/`, `quiz/epilogi-symvolaiou/`. (The first two units were renamed from `mathima-1`/`mathima-2` to `vasika-tou-mpritz`/`kanones-agoras`; the old addresses are redirect stubs in `lectures/mathima-N/` and `quiz/mathima-N/`. Never delete them: links to them were shared. The quizzes of units 05 and 06 were renamed from `mathima-5`/`mathima-6` to `technikes-ektelesis`/`anoigma-1-mazer` in the same way.)
 - No «Από το προηγούμενο μάθημα» slide: use «Τι χρειάζεσαι από πριν» (the concepts needed, with a link to the unit that covers them, named by title).
-- Tile kickers on the lecture/quiz index pages: «N διαφάνειες» / «N ερωτήσεις».
 - In the last slide / quiz note link to other units by their title. Add the new unit as «Επόμενη ενότητα» to the previous deck if it logically follows.
 - **Never name the teacher (or the summary author) anywhere on the site or in the repo**: no credit lines, no names in the PDF-derived text, titles, notes, README or this skill. Say «βασίζονται σε περίληψη» only if needed, without a name. This is the teacher's explicit request. (Source PDFs stay untracked and are never committed.)
 
@@ -31,30 +30,30 @@ The teacher forwards the links to the students and is wary of surprises: **stick
 
 ## Workflow
 
-1. **Read the PDF.** Use `Read` with `pages` (it shows page images, so suit symbols and tables are visible); `pdftotext -layout` is available as a cross-check. Find the lesson number N from the title/filename (A2.pdf → N=2). The summary is the source of truth.
+1. **Read the PDF.** Use `Read` with `pages` (it shows page images, so suit symbols, colours and tables are visible: render a page with `pdftoppm -r 150 -png` if you need to see colour codes); `pdftotext -layout` is available as a cross-check. Take the topic title from the PDF (not a lesson number) and decide the unit number `NN` = highest existing unit + 1 (look at `lectures/index.html`). The summary is the source of truth.
 2. **Check what exists:** `ls lectures quiz`, and whether `quiz/<slug>/` exists. The user usually says whether the quiz is already there; if it is, read its `questions.js` — the deck must agree with it (same terms, same examples where sensible, same question count in the last slide).
 3. **Write the deck** `lectures/<slug>/index.html` (see "Deck conventions"). Do not copy long passages of the summary verbatim into slides; explain, then give an example.
 4. **Wire it into the site** (see "Wiring").
 5. **Quiz:** only if it does not exist (see "Creating a quiz").
-6. **Verify visually** (see "Verification"), then report. Do **not** commit unless the user asks; leave the source PDF untracked unless asked.
+6. **Check and verify** (see "Verification": run `check.py` first, then look at the slides), then report. Do **not** commit or push unless the user asks (they confirm every commit and push explicitly); never stage the source PDFs (`git add -A -- . ':!*.pdf'`).
 
 ## Deck conventions
 
 Copy the `<head>`/script skeleton of `lectures/kanones-agoras/index.html` (change title, descriptions, canonical/og URLs to `/lectures/<slug>/`). Slide order:
 
-1. **Title** (suit symbols, `<h1>`, "Α΄ κύκλος · Μάθημα N", club name, note about navigation).
+1. **Title** (suit symbols, `<h1>` = topic title, `p.big` = «Ενότητα NN · <υπότιτλος>», club name, note about navigation; no credit line with a name).
 2. **«Τι θα δούμε»** – numbered list of the summary's sections + the example/quiz teaser box.
-3. **«Από το προηγούμενο μάθημα»** – 3 bullets recalling what the lesson builds on + what is new today (skip for lesson 1).
+3. **«Τι χρειάζεσαι από πριν»** – 3 bullets recalling the concepts needed, with links to the units that cover them (skip for unit 01).
 4. **Content slides**, grouped by the summary's sections; each slide starts with `<div class="kicker">K · Τίτλος ενότητας</div>`. One idea per slide: short bullets (≤ 4–5), then an `.example` box or a diagram. After a rule, add a "Τι παίζεις; / Ποιος κερδίζει; / Τι έγινε;" practice slide whose answer is hidden in a `class="fragment answer"` block.
 5. **«Συνοψίζοντας»** (`ul.recap`) – one bullet per section.
-6. **«Τι ακολουθεί»** – bullets + buttons: quiz of lesson N, previous lecture, `https://www.heraklion-bridge.gr/lessons/`, `../`. State the number of quiz questions (count them, see below).
+6. **«Τι ακολουθεί»** – bullets + short buttons: «Κουίζ NN», «← Ενότητα NN», «Ενότητα NN →», `https://www.heraklion-bridge.gr/lessons/`, `../`. State the number of quiz questions (count them, see below).
 
 Target ≈ 22–28 slides. Every slide must fit in 1280×720 (and 720×1280 portrait); if one overflows, split it or trim text — don't shrink fonts.
 
 Building blocks (all styled in `lectures/deck.css`; add new CSS there, never inline big styles, and add a `.portrait` variant if the block is a multi-column grid):
 
 - Layout: `.cols` / `.cols.even` (two columns), `.example` (adds the «Παράδειγμα» label), `.note`, `.center`, `.big`.
-- Cards: `<span class="pc">♠K</span>` (+ `red` for ♥♦, sizes `sm`/`xs`, `on` highlight, `dim`, `ghost` for a not-yet-played seat); hand by suit: `.hand` (see mathima-1 slide «Παράδειγμα: ένα χέρι»).
+- Cards: `<span class="pc">♠K</span>` (+ `red` for ♥♦, sizes `sm`/`xs`, `on` highlight, `dim`, `ghost` for a not-yet-played seat); hand by suit: `.hand` (see the slide «Παράδειγμα: ένα χέρι» in `vasika-tou-mpritz`); bonus colours on `.ladder td.g/.b/.p/.y` and the `.bonus` legend (see `epilogi-symvolaiou`).
 - Table diagrams: `.compass` (roles: `.seat.n/.e/.s/.w` with `ax1` N–S blue / `ax2` E–W purple, `.tag` = role pill, `.tag.def` = opening lead), `.trick` (one trick: each `.seat` has `<b>` name, `.pc`, `<i>` order), `.pile`.
 - Auction: `table.auction` with header order **Δύση, Βορράς, Ανατολή, Νότος**; leave leading cells empty so the dealer sits in his column; mark the closing passes with `class="end"` (yellow).
 - Bidding: `.bidbox` + `.bid` (`.pass`, `.ok`, `.no`), `.ladder` (35 bids), `.cmp` (compare two bids), `.counts`, `.need` (generic table; `.key`, `.ok`, `.bad`), `.outcomes`/`.oc`, `.rules`/`.rule`, `.flow`, `.suits`, `.trump-pill`.
@@ -72,7 +71,7 @@ Text rules:
 
 ## Wiring (after the deck exists)
 
-- `lectures/index.html`: add a `<a class="quiz-tile" href="<slug>/">` block (copy the existing one: kicker «<slide count> διαφάνειες», title, one-sentence description). Slide count = `grep -c "<section" lectures/<slug>/index.html`. Keep the credit/quiz-link note at the bottom accurate.
+- `lectures/index.html`: add a `<a class="quiz-tile" href="<slug>/">` block (copy the existing one: kicker «Ενότητα NN · <slide count> διαφάνειες», title, one-sentence description; tiles stay in unit order). Slide count = `grep -c "<section" lectures/<slug>/index.html`. Update the quiz links in the note at the bottom (labels «Κουίζ NN»).
 - `sitemap.xml`: add `https://learn.heraklion-bridge.gr/lectures/<slug>/` after the previous lecture.
 - Previous deck (`lectures/<previous-slug>/index.html`), last slide: add a `btnlink alt` to `../<slug>/` if it isn't there.
 - `README.md` already says `lectures/<slug>/`; update it only if something structural changed.
@@ -82,9 +81,9 @@ Text rules:
 ## Creating a quiz (only if `quiz/<slug>/` does not exist)
 
 1. `cp -r quiz/epilogi-symvolaiou quiz/<slug>`; in `index.html` replace the title / description / canonical / og URL / the link to the deck and the quiz note (no lesson number, see «Naming»); in `questions.js` replace the title comment and questions.
-2. **Questions:** 18–21, Greek, 4 options, one correct. Cover each fact of the summary at least once, then add worked-example questions that reuse the board widgets: `auction`, `context`, `hand`, `fullhand`, `trump`, `trick` (documented at the top of `quiz/mathima-1/questions.js`). Write `correct: 0` as the right answer — the engine shuffles unless `shuffle: false` (use `false` whenever the options are Βορράς/Ανατολή/Νότος/Δύση or are ordered/numbered in a way that matters). `explain` always gives the reason, quoting the rule from the summary.
-3. **Chain:** set `next` in `quiz/<slug>/questions.js` to the following existing quiz (or `null` if last) and update the previous quiz's `next` to `{ label: 'Κουίζ: <τίτλος>', href: 'quiz/<slug>/' }` (keep the order of the units).
-4. **Register it:** `assets/site.js` menu (`Κουίζ: <τίτλος>`, in the "Για μαθητές" dropdown), a tile in `quiz/index.html` (question count = number of questions), `sitemap.xml`. The home page tile in `index.html` is generic (no counts) and needs no change. Update the list of quizzes in `README.md`.
+2. **Questions:** 18–21, Greek, 4 options, one correct. Cover each fact of the summary at least once, then add worked-example questions that reuse the board widgets: `auction`, `context`, `hand`, `fullhand`, `trump`, `trick` (documented at the top of `quiz/vasika-tou-mpritz/questions.js`). Write `correct: 0` as the right answer — the engine shuffles unless `shuffle: false` (use `false` whenever the options are Βορράς/Ανατολή/Νότος/Δύση or are ordered/numbered in a way that matters). `explain` always gives the reason, quoting the rule from the summary.
+3. **Chain:** set `next` in `quiz/<slug>/questions.js` to the following existing quiz (or `null` if last) and update the previous quiz's `next` to `{ label: 'Κουίζ NN: <τίτλος>', href: 'quiz/<slug>/' }` (keep the order of the units).
+4. **Register it:** a tile in `quiz/index.html` (kicker «Ενότητα NN · N ερωτήσεις», N = number of questions) and `sitemap.xml` (the top menu has no quiz entries any more). The home page tile in `index.html` is generic (no counts) and needs no change. Update the list of quizzes in `README.md`.
 5. Question count: `grep -c "^    {" quiz/<slug>/questions.js` (each question object starts at 4-space indent) — cross-check with the number in the deck's last slide and the tiles.
 
 ## Players' material (`/paiktes/`) – only when the user says the PDF/text is for players
@@ -96,6 +95,14 @@ Text rules:
 - **Inspiration from other sites** (e.g. the user's friend's blog bridgeaddiction.blogspot.com): rewrite in your own words, never copy text, and credit/link the source on the page.
 
 ## Verification
+
+First run the automatic checks (no teacher name or lesson numbers, ΧΑ typed in Greek, grammar of bids / η μανς / η λεβέ / η αντάμ, links, unit numbering, slide and question counts vs. tiles, sitemap) and fix every FAIL:
+
+```bash
+python3 .claude/skills/lecture-from-summary/check.py <slug>
+```
+
+Then look at it. Statistics (GoatCounter, `assets/stats.js`) are loaded automatically by `site.js` and `deck.js` and need no per-unit work; localhost is ignored by GoatCounter.
 
 ```bash
 cd <repo> && python3 -m http.server 8123   # run in background
@@ -117,4 +124,4 @@ Then `resize_window` preset `mobile`, reload, and spot-check 2–3 slides with g
 
 ## Final report to the user
 
-Say what was created (deck path, slide count, quiz created or reused), which existing files were touched (lectures index, sitemap, previous deck, README, …), anything in the summary that was ambiguous or that you derived/added, and that nothing was committed.
+Say what was created (deck path, slide count, quiz created or reused), which existing files were touched (lectures index, quiz index, sitemap, previous deck, README, …), the `check.py` result, and **everything that was ambiguous, derived or added beyond the summary** (the teacher forwards the link to students and is wary of surprises). Give the local URLs, say that nothing was committed, and ask before committing/pushing (without the PDFs). After the push, remind that GitHub Pages needs a few minutes.

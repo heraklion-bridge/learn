@@ -144,7 +144,7 @@ html, body { background: #fff; }
 .btnlink.alt { background: transparent; color: var(--teal-dark) !important; border: 2px solid var(--teal-dark); }
 
 /* σύνδεσμος επιστροφής και οδηγίες πάνω στη σελίδα */
-.deck-back { position: fixed; top: 10px; left: 14px; z-index: 30; font: 600 15px/1 var(--r-main-font); background: rgba(255, 255, 255, .92); border: 1px solid #cfd8dc; border-radius: 999px; padding: 8px 14px; color: var(--teal-dark); text-decoration: none; }
+.deck-back { position: fixed; top: 10px; right: 14px; z-index: 30; font: 600 15px/1 var(--r-main-font); background: rgba(255, 255, 255, .92); border: 1px solid #cfd8dc; border-radius: 999px; padding: 8px 14px; color: var(--teal-dark); text-decoration: none; }
 .deck-back:hover { background: #fff; border-color: var(--teal); }
 @media print { .deck-back { display: none; } }
 
@@ -241,7 +241,7 @@ html, body { background: #fff; }
 .portrait .hand { font-size: 26px; }
 .portrait .compass .seat b { font-size: 24px; }
 .portrait .compass .seat { font-size: 20px; }
-.portrait .deck-back { font-size: 13px; padding: 6px 12px; top: 6px; left: 8px; }
+.portrait .deck-back { font-size: 13px; padding: 6px 12px; top: 6px; right: 8px; }
 .portrait .bid { min-width: 78px; height: 54px; font-size: 24px; }
 .portrait .btnlink { display: block; margin: 12px 0; text-align: center; }
 .portrait .counts, .portrait .outcomes, .portrait .rules { grid-template-columns: 1fr; }
