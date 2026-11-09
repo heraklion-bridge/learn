@@ -39,7 +39,7 @@ then open http://localhost:8000.
 ## Publishing (GitHub Pages + `learn.heraklion-bridge.gr`)
 
 1. Repository → **Settings → Pages** → Source: *Deploy from a branch* → `main` / `(root)`.
-2. DNS for `heraklion-bridge.gr`: add a **CNAME** record `learn` → `<your-github-username>.github.io` (in Cloudflare set it to *DNS only*).
+2. DNS for `heraklion-bridge.gr`: add a **CNAME** record `learn` → `heraklion-bridge.github.io` (the GitHub organization `heraklion-bridge`) (in Cloudflare set it to *DNS only*).
 3. **Settings → Pages → Custom domain**: `learn.heraklion-bridge.gr` (the `CNAME` file in this repo already says so), then tick **Enforce HTTPS** once it is offered.
 
 ## Credits
