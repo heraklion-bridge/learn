@@ -25,6 +25,10 @@ Shared parts: `assets/site.js` (top menu and footer – **edit the `menu` and `f
 - **Slides:** each slide is a `<section>…</section>` in `lectures/<unit>/index.html` (eight decks exist: `vasika-tou-mpritz`, `kanones-agoras`, `epilogi-symvolaiou`, `anoigma-1xa`, `technikes-ektelesis`, `anoigma-1-mazer`, `xemplokarisma-chromatista`, `anoigma-1-miner`; units are named by topic and numbered 01, 02, 03… in teaching order (shown as «Ενότητα NN» in titles and tile kickers; URLs have no numbers); the old `mathima-1`/`mathima-2` addresses are redirect stubs that must stay, because links to them were shared). Building blocks (styled in `lectures/deck.css`): `<div class="example">`, `class="fragment"`, playing cards `<span class="pc">♠K</span>` (add `red` for ♥ ♦). **New deck:** copy `lectures/mathima-1/`, replace the slides, add a tile in `lectures/index.html` and the page in `sitemap.xml`.
   Shortcuts while viewing: arrows/Space = next/previous, **Esc** = overview, **F** = full screen, **?** = help; add `?print-pdf` to the address to print or save as PDF.
 
+## v2 (new look, work in progress)
+
+`v2/` is a complete copy of the site restyled after the bridgetricks.com resource pages (icon rail on the left, white cards, green palette, «Υλικό» sidebar with counts and search). The lectures are listed as **Α κύκλος Μαθημάτων** and the quizzes as **Quiz Α' Κύκλου Μαθημάτων**. It lives at `/v2/`, is `noindex`, has no statistics script and is not in the sitemap. The sidebar entries come from the `SITE.units` list at the top of `v2/assets/site.js`; the lists on the pages are plain HTML (`<a class="res">` rows).
+
 ## Preview on your computer
 
 ```bash
