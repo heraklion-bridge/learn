@@ -2,9 +2,8 @@
    Μάθε Μπριτζ – Όμιλος Μπριτζ Ηρακλείου – κοινή διάταξη (v2)
    --------------------------------------------------------------------------
    Αυτό που θα αλλάζετε συχνότερα βρίσκεται στο μπλοκ SITE από κάτω:
-     • units  → οι ενότητες του Α κύκλου (τίτλος, μικρή περιγραφή για την αναζήτηση).
-                Εμφανίζονται στο πλευρικό μενού, και στους δύο καταλόγους:
-                «Α κύκλος Μαθημάτων» (lectures/<slug>/) και «Quiz Α' Κύκλου Μαθημάτων» (quiz/<slug>/).
+     • cycles → οι κύκλοι μαθημάτων και οι ενότητές τους (τίτλος, λέξεις για την αναζήτηση).
+                Εμφανίζονται στο πλευρικό μενού ως «Μαθήματα → Α κύκλος» και «Quiz → Α' κύκλος».
      • rail   → τα εικονίδια της μπάρας αριστερά.
      • footer → διεύθυνση, ώρες, e-mail, τηλέφωνα.
    Οι διευθύνσεις γράφονται σχετικά με τη ρίζα του site (π.χ. 'quiz/'). Μια πλήρης
@@ -13,29 +12,36 @@
 
 const SITE = {
 
-  /* ----- Ενότητες του Α κύκλου, με τη σειρά διδασκαλίας ----- */
-  units: [
-    { slug: 'vasika-tou-mpritz', title: 'Τα βασικά του μπριτζ', kw: 'παίκτες τράπουλα διανομή αγορά συμβόλαιο λεβέ ατού τσάκα' },
-    { slug: 'kanones-agoras', title: 'Κανόνες αγοράς και οδηγίες παιξίματος', kw: 'ιεραρχία αγορών συμβόλαιο εκτελεστής λεβέ οδηγίες παιξίματος' },
-    { slug: 'epilogi-symvolaiou', title: 'Αρχές επιλογής συμβολαίου', kw: 'σκορ μπόνους φιτ δύναμη χεριού ονέρ κατανομή ιδανικό συμβόλαιο' },
-    { slug: 'anoigma-1xa', title: 'Το άνοιγμα 1ΧΑ', kw: 'ορολογία αγοράς απαντήσεις επαναδήλωση ανοίξαντα 1ΧΑ' },
-    { slug: 'technikes-ektelesis', title: 'Τεχνικές εκτέλεσης, άμυνα, σινιάλα διάθεσης', kw: 'πλάνο ΑΒΓ προαγωγή ονέρ μαιτράρισμα αντάμ άμυνα σινιάλα διάθεσης' },
-    { slug: 'anoigma-1-mazer', title: 'Άνοιγμα 1 σε μαζέρ', kw: '1Μ κούπες πίκες απαντήσεις επαναδήλωση δεύτερη απάντηση' },
-    { slug: 'xemplokarisma-chromatista', title: 'Ξεμπλοκάρισμα, τεχνικές για χρωματιστά συμβόλαια', kw: 'ξεμπλοκάρισμα χανόμενες τσάκες πλάνο ΑΒΓ σινιάλο θέλω' },
-    { slug: 'anoigma-1-miner', title: 'Άνοιγμα 1 σε μινέρ', kw: '1μ σπαθιά καρά απαντήσεις επαναδήλωση δεύτερη απάντηση' }
+  /* ----- Κύκλοι μαθημάτων, με τις ενότητές τους (σειρά διδασκαλίας) -----
+     Κάθε κύκλος έχει δική του σελίδα (lectures/<slug>/ και quiz/<slug>/) και εμφανίζεται ως υπομενού
+     στα «Μαθήματα» και στα «Quiz». Οι ενότητες έχουν διευθύνσεις lectures/<unit>/ και quiz/<unit>/. */
+  cycles: [
+    {
+      slug: 'a-kyklos', lectures: 'Α κύκλος', quiz: 'Α\' κύκλος',
+      units: [
+        { slug: 'vasika-tou-mpritz', title: 'Τα βασικά του μπριτζ', kw: 'παίκτες τράπουλα διανομή αγορά συμβόλαιο λεβέ ατού τσάκα' },
+        { slug: 'kanones-agoras', title: 'Κανόνες αγοράς και οδηγίες παιξίματος', kw: 'ιεραρχία αγορών συμβόλαιο εκτελεστής λεβέ οδηγίες παιξίματος' },
+        { slug: 'epilogi-symvolaiou', title: 'Αρχές επιλογής συμβολαίου', kw: 'σκορ μπόνους φιτ δύναμη χεριού ονέρ κατανομή ιδανικό συμβόλαιο' },
+        { slug: 'anoigma-1xa', title: 'Το άνοιγμα 1ΧΑ', kw: 'ορολογία αγοράς απαντήσεις επαναδήλωση ανοίξαντα 1ΧΑ' },
+        { slug: 'technikes-ektelesis', title: 'Τεχνικές εκτέλεσης, άμυνα, σινιάλα διάθεσης', kw: 'πλάνο ΑΒΓ προαγωγή ονέρ μαιτράρισμα αντάμ άμυνα σινιάλα διάθεσης' },
+        { slug: 'anoigma-1-mazer', title: 'Άνοιγμα 1 σε μαζέρ', kw: '1Μ κούπες πίκες απαντήσεις επαναδήλωση δεύτερη απάντηση' },
+        { slug: 'xemplokarisma-chromatista', title: 'Ξεμπλοκάρισμα, τεχνικές για χρωματιστά συμβόλαια', kw: 'ξεμπλοκάρισμα χανόμενες τσάκες πλάνο ΑΒΓ σινιάλο θέλω' },
+        { slug: 'anoigma-1-miner', title: 'Άνοιγμα 1 σε μινέρ', kw: '1μ σπαθιά καρά απαντήσεις επαναδήλωση δεύτερη απάντηση' }
+      ]
+    }
   ],
 
-  /* ----- Τίτλοι των δύο καταλόγων ----- */
+  /* ----- Οι δύο κεντρικές ενότητες (το κουμπί αριστερά και το πρώτο επίπεδο του μενού) ----- */
   sections: {
-    lectures: { label: 'Α κύκλος Μαθημάτων', kind: 'Διαφάνειες', dir: 'lectures/' },
-    quiz: { label: 'Quiz Α\' Κύκλου Μαθημάτων', kind: 'Κουίζ', dir: 'quiz/' }
+    lectures: { label: 'Μαθήματα', kind: 'Διαφάνειες', dir: 'lectures/' },
+    quiz: { label: 'Quiz', kind: 'Κουίζ', dir: 'quiz/' }
   },
 
   /* ----- Μπάρα εικονιδίων αριστερά ----- */
   rail: [
     { id: 'home', label: 'Αρχική', href: '', icon: 'spade' },
-    { id: 'lectures', label: 'Α κύκλος Μαθημάτων', href: 'lectures/', icon: 'book' },
-    { id: 'quiz', label: 'Quiz Α\' Κύκλου Μαθημάτων', href: 'quiz/', icon: 'check' },
+    { id: 'lectures', label: 'Μαθήματα', href: 'lectures/', icon: 'book' },
+    { id: 'quiz', label: 'Quiz', href: 'quiz/', icon: 'check' },
     { id: 'paiktes', label: 'Για παίκτες (σύντομα)', href: 'paiktes/', icon: 'users' }
   ],
   club: { label: 'Σελίδα Ομίλου', href: 'https://www.heraklion-bridge.gr/' },
@@ -106,19 +112,28 @@ const SITE = {
   }
 
   /* ----- πλευρικό μενού «Υλικό» ----- */
+  function row(href, label, count, isCurrent, isOpen) {
+    return '<div class="side-row' + (isCurrent ? ' current' : '') + '">' +
+      '<button type="button" class="chev-btn" aria-expanded="' + isOpen + '" aria-label="Άνοιγμα / κλείσιμο: ' + esc(label) + '">' + svg('chev', 'chev') + '</button>' +
+      '<a class="lbl" href="' + esc(url(href)) + '"' + (isCurrent ? ' aria-current="page"' : '') + '>' + esc(label) + '</a>' +
+      '<span class="count">' + count + '</span></div>';
+  }
+  function unitCount(cycles) { return cycles.reduce(function (n, c) { return n + c.units.length; }, 0); }
+
   function buildSide() {
     var groups = ['lectures', 'quiz'].map(function (key) {
       var sec = SITE.sections[key];
-      var open = current === key;
-      var items = SITE.units.map(function (u, i) {
-        var href = sec.dir + u.slug + '/';
-        return '<li><a href="' + esc(url(href)) + '"' + (here === href ? ' class="current" aria-current="page"' : '') + '><b>' + num(i) + '</b> ' + esc(u.title) + '</a></li>';
+      var secOpen = current === key;
+      var nest = SITE.cycles.map(function (cy) {
+        var cyHref = sec.dir + cy.slug + '/';
+        var cyOpen = here === cyHref || cy.units.some(function (u) { return here === sec.dir + u.slug + '/'; });
+        var items = cy.units.map(function (u, i) {
+          var href = sec.dir + u.slug + '/';
+          return '<li><a href="' + esc(url(href)) + '"' + (here === href ? ' class="current" aria-current="page"' : '') + '><b>' + num(i) + '</b> ' + esc(u.title) + '</a></li>';
+        }).join('');
+        return '<div class="side-group' + (cyOpen ? ' open' : '') + '">' + row(cyHref, cy[key], cy.units.length, here === cyHref, cyOpen) + '<ul class="side-sub">' + items + '</ul></div>';
       }).join('');
-      return '<div class="side-group' + (open ? ' open' : '') + '">' +
-        '<button type="button" class="side-row' + (here === sec.dir ? ' current' : '') + '" aria-expanded="' + open + '">' +
-          svg('chev', 'chev') + '<span class="lbl">' + esc(sec.label) + '</span><span class="count">' + SITE.units.length + '</span></button>' +
-        '<ul class="side-sub">' +
-          '<li><a href="' + esc(url(sec.dir)) + '"' + (here === sec.dir ? ' class="current"' : '') + '>Όλες οι ενότητες</a></li>' + items + '</ul></div>';
+      return '<div class="side-group' + (secOpen ? ' open' : '') + '">' + row(sec.dir, sec.label, unitCount(SITE.cycles), here === sec.dir, secOpen) + '<div class="side-nest">' + nest + '</div></div>';
     }).join('');
 
     var aside = document.createElement('aside');
@@ -126,15 +141,15 @@ const SITE = {
     aside.setAttribute('aria-label', 'Υλικό');
     aside.innerHTML =
       '<nav class="side-card" aria-label="Υλικό"><h2>Υλικό</h2>' + groups +
-        '<div class="side-group"><a class="side-row soon" href="' + esc(url('paiktes/')) + '"><span style="width:14px"></span><span class="lbl">Για παίκτες</span><span class="count" style="font-weight:400">σύντομα</span></a></div>' +
+        '<div class="side-group"><div class="side-row soon"><span class="chev-btn"></span><a class="lbl" href="' + esc(url('paiktes/')) + '">Για παίκτες</a><span class="count" style="font-weight:400">σύντομα</span></div></div>' +
       '</nav>' +
       '<div class="side-search" role="search">' + svg('search', 'ico-lg') +
         '<input type="search" placeholder="Αναζήτηση" aria-label="Αναζήτηση στο υλικό" autocomplete="off">' +
         '<ul class="search-results" hidden></ul></div>';
 
-    aside.querySelectorAll('.side-group > button.side-row').forEach(function (b) {
+    aside.querySelectorAll('.chev-btn').forEach(function (b) {
       b.addEventListener('click', function () {
-        var open = b.parentNode.classList.toggle('open');
+        var open = b.closest('.side-group').classList.toggle('open');
         b.setAttribute('aria-expanded', open);
       });
     });
@@ -148,11 +163,13 @@ const SITE = {
       var hits = [];
       ['lectures', 'quiz'].forEach(function (key) {
         var sec = SITE.sections[key];
-        SITE.units.forEach(function (u, i) {
-          var hay = plain(u.title + ' ' + u.kw + ' ' + sec.kind + ' ' + num(i));
-          if (terms.every(function (t) { return hay.indexOf(t) !== -1; })) {
-            hits.push('<li><a href="' + esc(url(sec.dir + u.slug + '/')) + '">' + esc(u.title) + '<small>' + esc(sec.kind) + ' · Ενότητα ' + num(i) + '</small></a></li>');
-          }
+        SITE.cycles.forEach(function (cy) {
+          cy.units.forEach(function (u, i) {
+            var hay = plain(u.title + ' ' + u.kw + ' ' + sec.kind + ' ' + cy[key] + ' ' + num(i));
+            if (terms.every(function (t) { return hay.indexOf(t) !== -1; })) {
+              hits.push('<li><a href="' + esc(url(sec.dir + u.slug + '/')) + '">' + esc(u.title) + '<small>' + esc(sec.kind) + ' · ' + esc(cy[key]) + ' · Ενότητα ' + num(i) + '</small></a></li>');
+            }
+          });
         });
       });
       out.innerHTML = hits.length ? hits.join('') : '<li class="none">Δεν βρέθηκε τίποτα.</li>';

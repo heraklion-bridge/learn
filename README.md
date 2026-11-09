@@ -27,7 +27,7 @@ Shared parts: `assets/site.js` (top menu and footer – **edit the `menu` and `f
 
 ## v2 (new look, work in progress)
 
-`v2/` is a complete copy of the site restyled after the bridgetricks.com resource pages (icon rail on the left, white cards, green palette, «Υλικό» sidebar with counts and search). The lectures are listed as **Α κύκλος Μαθημάτων** and the quizzes as **Quiz Α' Κύκλου Μαθημάτων**. It lives at `/v2/`, is `noindex`, has no statistics script and is not in the sitemap. The sidebar entries come from the `SITE.units` list at the top of `v2/assets/site.js`; the lists on the pages are plain HTML (`<a class="res">` rows).
+`v2/` is a complete copy of the site restyled after the bridgetricks.com resource pages (icon rail on the left, white cards, green palette, «Υλικό» sidebar with counts and search). The left buttons lead to the central menus **Μαθήματα** (`v2/lectures/`) and **Quiz** (`v2/quiz/`); each lists the lesson cycles. The first cycle is **Α κύκλος** (`v2/lectures/a-kyklos/`, titled «Α κύκλος Μαθημάτων») and **Α' κύκλος** (`v2/quiz/a-kyklos/`, titled «Quiz Α' Κύκλου Μαθημάτων»); the unit pages keep their addresses (`v2/lectures/<unit>/`, `v2/quiz/<unit>/`). It is `noindex`, has no statistics script and is not in the sitemap. The sidebar comes from the `SITE.cycles` list at the top of `v2/assets/site.js` (a new cycle = a new entry there plus a new `a-kyklos`-like folder and a row in the two central pages); the lists on the pages are plain HTML (`<a class="res">` rows).
 
 ## Preview on your computer
 
