@@ -57,7 +57,8 @@ const SITE = {
         slug: 'meta-anoigma-1nt', label: 'Μετά από άνοιγμα 1NT',
         items: [
           { slug: 'stayman', title: 'Stayman', kw: 'stayman 2♣ 4φ τετράφυλλο μαζέρ απάντηση 1NT συμβατική' },
-          { slug: 'jacoby-transfer', title: '2♦/♥ Jacoby transfer', kw: 'jacoby transfer μεταφορά 2♦ 2♥ 5φ πεντάφυλλο μαζέρ 1NT συμβατική' }
+          { slug: 'jacoby-transfer', title: '2♦/♥ Jacoby transfer', kw: 'jacoby transfer μεταφορά 2♦ 2♥ 5φ πεντάφυλλο μαζέρ 1NT συμβατική' },
+          { slug: 'lebensohl', title: 'Lebensohl', kw: 'lebensohl lebenshol παρεμβολή παρέμβαση επέμβαση αντίπαλοι 2NT 3♣ στοπ cue bid 1NT συμβατική' }
         ]
       }
     ]
