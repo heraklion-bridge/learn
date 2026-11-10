@@ -60,8 +60,10 @@ const SITE = {
   /* ----- Υποσέλιδο ----- */
   footer: {
     address: ['Λεωφόρος Δημοκρατίας 73'],
-    hours: ['Κυριακή: 19.30-23.00', 'Δευτέρα 19:30-23:00', 'Τετάρτη: 19.30-23.00', 'Πέμπτη 19:30-23:00'],
+    hours: ['Κυριακή, Δευτέρα, Τετάρτη, Πέμπτη: 19:30–23:00'],
     emailUser: 'omi', emailDomain: 'hellasbridge.org',   // γραμμένο σε δύο μέρη, ώστε να μην το διαβάζουν τα bots
+    // επικοινωνία για προβλήματα / λάθη: το e-mail δεν υπάρχει πουθενά στο HTML, φτιάχνεται από το JavaScript (και αυτό σε δύο μέρη)
+    reportName: 'τον κ. Καμαριανάκη Μάνο', reportUser: 'm.kamarianakis', reportDomain: 'gmail.com',
     facebook: 'http://fb.com/HeraklionBridgeClub',
     instagram: 'https://www.instagram.com/heraklionbridgeclub/',
     social: 'HeraklionBridgeClub',
@@ -116,9 +118,8 @@ const SITE = {
     rail.className = 'rail';
     rail.setAttribute('aria-label', 'Κύριο μενού');
     rail.innerHTML =
-      '<a class="rail-brand" href="' + esc(url('')) + '" aria-label="Μάθε Μπριτζ – αρχική"><img src="' + esc(url('assets/img/logo.png')) + '" width="28" height="28" alt=""></a>' +
       links + '<span class="spacer"></span>' +
-      '<a class="rail-link club" href="' + esc(SITE.club.href) + '" aria-label="' + esc(SITE.club.label) + '">' + svg('out') + '<span class="tip">' + esc(SITE.club.label) + '</span></a>';
+      '<a class="rail-link club" href="' + esc(SITE.club.href) + '" aria-label="' + esc(SITE.club.label) + '"><img src="' + esc(url('assets/img/logo.png')) + '" width="34" height="34" alt=""><span class="tip">' + esc(SITE.club.label) + '</span></a>';
     return rail;
   }
 
@@ -225,6 +226,7 @@ const SITE = {
   function buildFooter() {
     var f = SITE.footer;
     var email = f.emailUser + '@' + f.emailDomain;
+    var report = f.reportUser + '@' + f.reportDomain;
     var phones = f.phones.map(function (p) {
       return '<li>' + esc(p.name) + ' · <a href="tel:' + esc(p.tel.replace(/\s+/g, '')) + '">' + esc(p.tel) + '</a></li>';
     }).join('');
@@ -239,6 +241,7 @@ const SITE = {
           '<li><a href="' + esc(f.instagram) + '" rel="noopener">Instagram · ' + esc(f.social) + '</a></li></ul></div>' +
         '<div><h2>Τηλέφωνα</h2><ul>' + phones + '</ul></div>' +
       '</div>' +
+      '<p class="report">Εάν εντοπίσατε κάποιο πρόβλημα ή λάθος επικοινωνήστε με ' + esc(f.reportName) + ' (<a href="mailto:' + esc(report) + '">' + esc(report) + '</a>)</p>' +
       '<div class="copy">© ' + new Date().getFullYear() + ' Όμιλος Μπριτζ Ηρακλείου (ΟΜΗ) · <a href="https://www.heraklion-bridge.gr/">www.heraklion-bridge.gr</a><br>Ανώνυμα στατιστικά χρήσης, χωρίς cookies.</div>';
     return footer;
   }

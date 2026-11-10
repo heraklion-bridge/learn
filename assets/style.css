@@ -37,16 +37,15 @@ h1, h2, h3, h4, h5 { font-family: var(--font-head); color: var(--head); line-hei
 /* ---------- σελίδα: μπάρα εικονιδίων αριστερά, περιεχόμενο, πλευρικό μενού ---------- */
 .rail { position: fixed; z-index: 40; left: 0; top: 0; bottom: 0; width: var(--rail); background: var(--card); display: flex; flex-direction: column; align-items: center; padding: 14px 0; gap: 6px; box-shadow: 1px 0 0 var(--line); }
 .rail .spacer { flex: 1; }
-.rail-brand { display: block; width: 28px; height: 28px; margin: 0 0 14px; border-radius: 50%; overflow: hidden; }
-.rail-brand img { display: block; width: 28px; height: 28px; }
 .rail-link { position: relative; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 10px; color: #4f5f56; text-decoration: none; }
 .rail-link:hover { background: #f1f4f2; color: var(--teal-dark); }
 .rail-link.current { background: var(--accent-soft); color: var(--teal-dark); }
 .rail-link svg { width: 20px; height: 20px; }
 .rail-link .tip { position: absolute; left: calc(100% + 8px); top: 50%; transform: translateY(-50%); white-space: nowrap; background: var(--card); border: 1px solid #e3e6e8; border-radius: 6px; padding: 4px 9px; font-size: 14px; line-height: 1.4; color: var(--ink); box-shadow: 0 4px 12px rgba(0, 0, 0, .08); opacity: 0; pointer-events: none; transition: opacity .12s; z-index: 50; }
 .rail-link:hover .tip, .rail-link:focus-visible .tip { opacity: 1; }
-.rail-link.club { background: var(--teal-dark); color: #fff; }
-.rail-link.club:hover { background: var(--teal); color: #fff; }
+.rail-link.club { width: 44px; height: 44px; }
+.rail-link.club img { display: block; width: 34px; height: 34px; border-radius: 50%; }
+.rail-link.club:hover { background: #f1f4f2; }
 
 .shell { margin-left: var(--rail); padding: 40px 32px 0; min-height: 100vh; display: flex; flex-direction: column; }
 .shell-in { width: 100%; max-width: 1312px; margin: 0 auto; flex: 1; }
@@ -146,6 +145,7 @@ main.page > :first-child { margin-top: 0; }
 .site-footer a:hover { text-decoration: underline; }
 .site-footer ul { list-style: none; padding: 0; margin: 0; }
 .site-footer li { display: flex; align-items: center; gap: 8px; margin: 2px 0; }
+.site-footer .report { max-width: 1312px; margin: 20px auto 0; font-size: 14px; color: var(--ink); }
 .site-footer .copy { max-width: 1312px; margin: 20px auto 0; padding-top: 14px; border-top: 1px solid var(--line); font-size: 13px; }
 
 /* ---------- ανάλογα με το πλάτος ---------- */
@@ -157,8 +157,7 @@ main.page > :first-child { margin-top: 0; }
 @media (max-width: 720px) {
   .rail { position: sticky; top: 0; bottom: auto; left: 0; width: 100%; height: 56px; flex-direction: row; justify-content: center; padding: 8px 12px; gap: 4px; box-shadow: 0 1px 0 var(--line); }
   .rail .spacer { flex: 1; }
-  .rail-brand { margin: 0 10px 0 0; }
-  .rail-link .tip { display: none; }
+    .rail-link .tip { display: none; }
   .shell { margin-left: 0; padding: 20px 16px 0; min-height: calc(100vh - 56px); }
   .page-head h1 { font-size: 30px; }
   .page-icon { width: 46px; height: 46px; }

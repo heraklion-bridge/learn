@@ -132,7 +132,12 @@ def check_unit(slug):
     qs = re.findall(r'correct:\s*(\d+)', src['questions'])
     report(len(qs) == questions, 'every question has a correct answer', '%d questions, %d correct' % (questions, len(qs)))
     report(18 <= questions <= 21, 'question count is 18-21', str(questions))
-    report('next:' in src['questions'], 'questions.js has a next: entry (link or null)')
+    report('next:' not in src['questions'], 'questions.js has no next: entry (quizzes do not link to the next quiz)')
+
+    # 8. minimal end-of-unit links: last slide = quiz + back to the list; quiz page has no extra note
+    btns = re.findall(r'<a class="btnlink[^"]*" href="([^"]+)"', src['deck'])
+    report(sorted(btns) == sorted(['../../quiz/%s/' % slug, '../a-kyklos/']), 'last slide has only the quiz button and the back button', ', '.join(btns))
+    report('quiz-note' not in src['quiz page'], 'quiz page has no quiz-note paragraph with extra links')
 
 
 if __name__ == '__main__':
