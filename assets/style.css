@@ -409,6 +409,47 @@ html.js body:not(.ready) main.page { opacity: 0; animation: reveal 0s 1.5s forwa
   .sy-table tbody th { width: 40%; }
 }
 
+/* ---------- Συμβάσεις: δέντρο αγορών, πίνακες, διάγραμμα χεριών, πίνακας αγοράς ---------- */
+.ctree-bar { display: flex; gap: 8px; margin: 10px 0 4px; }
+.ctree { margin: 6px 0 14px; }
+.ctree .cn { margin: 0; }
+.ctree summary, .ctree .leaf { display: flex; align-items: baseline; gap: 10px; padding: 5px 6px; border-radius: 8px; list-style: none; }
+.ctree summary { cursor: pointer; }
+.ctree summary::-webkit-details-marker { display: none; }
+.ctree summary:hover { background: #f4f7f5; }
+.ctree summary::before { content: '▾'; flex: none; width: 16px; text-align: center; color: var(--muted); }
+.ctree details:not([open]) > summary::before { content: '▸'; }
+.ctree .leaf::before { content: ''; flex: none; width: 16px; }
+.ctree .cb { flex: none; min-width: 46px; padding: 3px 10px; border: 1.5px solid #cdd8d1; border-radius: 8px; background: #fff; text-align: center; font-weight: 700; color: var(--head); white-space: nowrap; }
+.ctree .cm { flex: 1; min-width: 0; font-size: 15px; color: #2c3a33; overflow-wrap: anywhere; }
+.ctree .ck { margin-left: 13px; padding-left: 14px; border-left: 2px solid #dbe5df; }
+.ty { display: inline-block; padding: 0 8px; border-radius: 999px; font-size: 12.5px; font-weight: 600; line-height: 1.6; white-space: nowrap; }
+.ty.fin { background: #e8efe9; color: #3f5a49; }
+.ty.inv { background: #fdf1d8; color: #8a5a00; }
+.ty.frc { background: #fbe4e2; color: #a3261e; }
+.ctree-legend { margin: 4px 0 0; }
+.page .ctable { width: 100%; border-collapse: collapse; margin: 10px 0 14px; font-size: 15px; }
+.page .ctable th, .page .ctable td { padding: 8px 12px; border: 0; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; background: none; }
+.page .ctable thead th { font-size: 12.5px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
+.page .ctable tbody th { width: 22%; font-weight: 700; white-space: nowrap; color: var(--teal-dark); }
+.deal { display: grid; grid-template-columns: 1fr 1fr 1fr; grid-template-areas: ". n ." "w c e" ". s ."; gap: 12px; max-width: 620px; margin: 1.4em auto 1em; padding: 18px; background: linear-gradient(135deg, #2f6e4f 0%, #234e38 100%); border-radius: 14px; color: #fff; }
+.deal .dhand { background: #fff; color: var(--head); border-radius: 10px; padding: 10px 14px; box-shadow: 0 2px 5px rgba(0, 0, 0, .25); font-size: 17px; line-height: 1.5; font-weight: 600; font-variant-numeric: tabular-nums; }
+.deal .dhand.n { grid-area: n; } .deal .dhand.w { grid-area: w; } .deal .dhand.e { grid-area: e; } .deal .dhand.s { grid-area: s; }
+.deal .seat { display: block; margin-bottom: 2px; font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.deal .dhand p { margin: 0; white-space: nowrap; }
+.deal .dhand .rs { color: var(--red); }
+.deal .info { grid-area: c; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; font-size: 14px; line-height: 1.35; }
+.deal .info b { display: block; font-size: 40px; line-height: 1.1; }
+.page .auction { width: 100%; max-width: 620px; margin: 0 auto 1em; border-collapse: collapse; font-size: 16px; text-align: center; }
+.page .auction th { padding: 8px 6px; border: 0; border-bottom: 2px solid var(--teal); background: none; text-align: center; font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--teal-dark); }
+.page .auction td { width: 25%; padding: 7px 6px; border: 0; border-bottom: 1px solid var(--line); text-align: center; font-weight: 600; }
+.page .auction tr:last-child td { border-bottom: 0; }
+@media (max-width: 720px) {
+  .deal { grid-template-columns: 1fr 1fr; grid-template-areas: "n n" "w e" "s s" "c c"; padding: 12px; gap: 8px; }
+  .deal .dhand { padding: 8px 10px; font-size: 15px; }
+  .page .ctable tbody th { white-space: normal; }
+}
+
 @media print {
   @page { margin: 12mm; }
   body { background: #fff; }

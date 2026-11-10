@@ -49,12 +49,27 @@ const SITE = {
     ]
   },
 
+  /* ----- Συμβάσεις: ομάδες συμβάσεων και οι σελίδες τους (symvaseis/<ομάδα>/<σύμβαση>/) ----- */
+  conventions: {
+    label: 'Συμβάσεις', dir: 'symvaseis/',
+    groups: [
+      {
+        slug: 'meta-anoigma-1nt', label: 'Μετά από άνοιγμα 1NT',
+        items: [
+          { slug: 'stayman', title: 'Stayman', kw: 'stayman 2♣ 4φ τετράφυλλο μαζέρ απάντηση 1NT συμβατική' },
+          { slug: 'jacoby-transfer', title: '2♦/♥ Jacoby transfer', kw: 'jacoby transfer μεταφορά 2♦ 2♥ 5φ πεντάφυλλο μαζέρ 1NT συμβατική' }
+        ]
+      }
+    ]
+  },
+
   /* ----- Μπάρα εικονιδίων αριστερά ----- */
   rail: [
     { id: 'home', label: 'Αρχική', href: '', icon: 'spade' },
     { id: 'lectures', label: 'Μαθήματα', href: 'lectures/', icon: 'book' },
     { id: 'quiz', label: 'Quiz', href: 'quiz/', icon: 'check' },
-    { id: 'paiktes', label: 'Για παίκτες', href: 'paiktes/', icon: 'users' }
+    { id: 'paiktes', label: 'Για παίκτες', href: 'paiktes/', icon: 'users' },
+    { id: 'symvaseis', label: 'Συμβάσεις', href: 'symvaseis/', icon: 'tree' }
   ],
   club: { label: 'Σελίδα Ομίλου', href: 'https://www.heraklion-bridge.gr/' },
 
@@ -97,6 +112,7 @@ const SITE = {
     users: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.9"/><path d="M16 3.1a4 4 0 0 1 0 7.8"/>',
     out: '<path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>',
     search: '<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',
+    tree: '<circle cx="6" cy="6" r="2.5"/><circle cx="6" cy="18" r="2.5"/><circle cx="18" cy="12" r="2.5"/><path d="M6 8.5v7M8.5 6H12a4 4 0 0 1 4 4v.5M8.5 18H12a4 4 0 0 0 4-4v-.5"/>',
     chev: '<path d="m9 18 6-6-6-6"/>'
   };
   function svg(name, cls) {
@@ -153,6 +169,22 @@ const SITE = {
     return '<div class="side-group' + (open ? ' open' : '') + '">' + row(pl.dir, pl.label, total, here === pl.dir, open) + '<div class="side-nest">' + nest + '</div></div>';
   }
 
+  function conventionsGroup() {
+    var cv = SITE.conventions;
+    var open = current === 'symvaseis';
+    var nest = cv.groups.map(function (g) {
+      var gHref = cv.dir + g.slug + '/';
+      var gOpen = here.indexOf(gHref) === 0;
+      var items = g.items.map(function (it, i) {
+        var href = gHref + it.slug + '/';
+        return '<li><a href="' + esc(url(href)) + '"' + (here === href ? ' class="current" aria-current="page"' : '') + '><b>' + num(i) + '</b> ' + esc(it.title) + '</a></li>';
+      }).join('');
+      return '<div class="side-group' + (gOpen ? ' open' : '') + '">' + row(gHref, g.label, g.items.length, here === gHref, gOpen) + '<ul class="side-sub">' + items + '</ul></div>';
+    }).join('');
+    var total = cv.groups.reduce(function (n, g) { return n + g.items.length; }, 0);
+    return '<div class="side-group' + (open ? ' open' : '') + '">' + row(cv.dir, cv.label, total, here === cv.dir, open) + '<div class="side-nest">' + nest + '</div></div>';
+  }
+
   function buildSide() {
     var groups = ['lectures', 'quiz'].map(function (key) {
       var sec = SITE.sections[key];
@@ -175,6 +207,7 @@ const SITE = {
     aside.innerHTML =
       '<nav class="side-card" aria-label="Υλικό"><h2>Υλικό</h2>' + groups +
         playersGroup() +
+        conventionsGroup() +
       '</nav>' +
       '<div class="side-search" role="search">' + svg('search', 'ico-lg') +
         '<input type="search" placeholder="Αναζήτηση" aria-label="Αναζήτηση στο υλικό" autocomplete="off">' +
@@ -216,6 +249,13 @@ const SITE = {
         if (terms.every(function (t) { return plain(pg.title + ' ' + pg.kw).indexOf(t) !== -1; })) {
           hits.push('<li><a href="' + esc(url(SITE.players.dir + pg.slug + '/')) + '">' + esc(pg.title) + '<small>' + esc(SITE.players.label) + '</small></a></li>');
         }
+      });
+      SITE.conventions.groups.forEach(function (g) {
+        g.items.forEach(function (it) {
+          if (terms.every(function (t) { return plain(it.title + ' ' + it.kw + ' ' + g.label + ' ' + SITE.conventions.label).indexOf(t) !== -1; })) {
+            hits.push('<li><a href="' + esc(url(SITE.conventions.dir + g.slug + '/' + it.slug + '/')) + '">' + esc(it.title) + '<small>' + esc(SITE.conventions.label) + ' · ' + esc(g.label) + '</small></a></li>');
+          }
+        });
       });
       out.innerHTML = hits.length ? hits.join('') : '<li class="none">Δεν βρέθηκε τίποτα.</li>';
       out.hidden = false;
@@ -273,7 +313,7 @@ const SITE = {
       if (crumbs) head.appendChild(crumbs);
       var icon = document.createElement('span');
       icon.className = 'page-icon';
-      icon.innerHTML = svg({ home: 'spade', lectures: 'book', quiz: 'check', paiktes: 'users' }[current] || 'spade');
+      icon.innerHTML = svg({ home: 'spade', lectures: 'book', quiz: 'check', paiktes: 'users', symvaseis: 'tree' }[current] || 'spade');
       head.appendChild(icon);
       head.appendChild(h1);
       inner.appendChild(head);
