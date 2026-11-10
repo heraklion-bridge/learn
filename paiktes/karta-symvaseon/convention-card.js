@@ -92,12 +92,10 @@ var DEFAULTS = {
   'use strict';
 
   var KEY = 'hbc-convention-card-v1';
-  var SUITS = { s: '♠', h: '♥', d: '♦', c: '♣' };
   var MAX_CUSTOM = 30;
   var root = document.getElementById('cc');
   var state = {};          // id -> κείμενο, 'c:<σύμβαση>' -> '1'/'', 'n:<σύμβαση>' -> σημείωση, 'custom' -> JSON λίστα, 'notes' -> σημειώσεις
   var shared = false;      // true όταν βλέπουμε κάρτα από σύνδεσμο (δεν αποθηκεύεται αυτόματα)
-  var lastField = null;    // το τελευταίο πεδίο κειμένου που είχε εστίαση (για τα σύμβολα)
 
   /* ---------- βοηθητικά ---------- */
   function el(tag, attrs, kids) {
@@ -162,46 +160,12 @@ var DEFAULTS = {
   function toB64(s) { return btoa(unescape(encodeURIComponent(s))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); }
   function fromB64(s) { s = s.replace(/-/g, '+').replace(/_/g, '/'); while (s.length % 4) s += '='; return decodeURIComponent(escape(atob(s))); }
 
-  /* ---------- σύμβολα τράπουλας ---------- */
-  function insertAt(input, text) {
-    var s = input.selectionStart == null ? input.value.length : input.selectionStart;
-    var e = input.selectionEnd == null ? s : input.selectionEnd;
-    input.value = input.value.slice(0, s) + text + input.value.slice(e);
-    input.setSelectionRange(s + text.length, s + text.length);
-    input.dispatchEvent(new Event('input', { bubbles: true }));
-  }
-  function shortcuts(input) {            // !s !h !d !c → ♠ ♥ ♦ ♣, με σωστή θέση του δρομέα
-    var re = /!([shdc])/gi;
-    if (!re.test(input.value)) return;
-    var pos = input.selectionStart == null ? input.value.length : input.selectionStart;
-    var conv = function (t) { return t.replace(/!([shdc])/gi, function (m, l) { return SUITS[l.toLowerCase()]; }); };
-    var before = conv(input.value.slice(0, pos));
-    input.value = before + conv(input.value.slice(pos));
-    input.setSelectionRange(before.length, before.length);
-  }
-  function symbolBar() {
-    var bar = el('div', { class: 'cc-symbols', role: 'group', 'aria-label': 'Σύμβολα τράπουλας' }, [el('span', { class: 'cc-sym-label', text: 'Σύμβολα' })]);
-    [['s', 'Πίκα'], ['h', 'Κούπα'], ['d', 'Καρό'], ['c', 'Σπαθί']].forEach(function (x) {
-      var b = el('button', { type: 'button', class: 'cc-sym' + (x[0] === 'h' || x[0] === 'd' ? ' rs' : ''), 'aria-label': 'Εισαγωγή: ' + x[1], title: x[1] + ' (!' + x[0] + ')', text: SUITS[x[0]] });
-      b.addEventListener('mousedown', function (e) { e.preventDefault(); });   // το πεδίο κρατά την εστίαση
-      b.addEventListener('click', function () {
-        if (!lastField || !document.body.contains(lastField)) { toast('Πατήστε πρώτα μέσα σε ένα πεδίο κειμένου.'); return; }
-        lastField.focus();
-        insertAt(lastField, SUITS[x[0]]);
-      });
-      bar.appendChild(b);
-    });
-    bar.appendChild(el('span', { class: 'cc-sym-hint', text: 'ή γράψτε !s !h !d !c' }));
-    return bar;
-  }
-
   /* ---------- φόρμα ---------- */
   var inputs = {};   // id -> στοιχείο φόρμας
   var convItems = {};
   function bind(input, key) {
     inputs[key] = input;
     input.addEventListener('input', function () {
-      if (input.type === 'text' || input.tagName === 'TEXTAREA') shortcuts(input);
       state[key] = input.type === 'checkbox' ? (input.checked ? '1' : '') : input.value;
       if (input.type === 'checkbox' && convItems[key]) convItems[key].classList.toggle('on', input.checked);
       save();
@@ -239,7 +203,6 @@ var DEFAULTS = {
       var del = el('button', { type: 'button', class: 'cc-del', 'aria-label': 'Διαγραφή σύμβασης', title: 'Διαγραφή', text: '✕' });
       name.value = c.n; note.value = c.t;
       function upd() {
-        shortcuts(name); shortcuts(note);
         var l = parseCustom(state.custom); if (!l[i]) return;
         l[i] = { n: name.value, t: note.value };
         state.custom = JSON.stringify(l); save(); renderSheet();
@@ -294,10 +257,6 @@ var DEFAULTS = {
     var ta = el('textarea', { id: 'cc-notes', rows: '4', maxlength: '2000', placeholder: 'Ό,τι άλλο θέλουν να ξέρουν οι αντίπαλοι: ειδικά ανοίγματα, εξαιρέσεις, αγορές με άλλη σημασία…' });
     bind(ta, 'notes');
     form.appendChild(el('section', { class: 'cc-sec' }, [el('h2', { text: 'Σημειώσεις' }), ta]));
-    form.addEventListener('focusin', function (e) {
-      var t = e.target;
-      if (t.tagName === 'TEXTAREA' || (t.tagName === 'INPUT' && t.type === 'text')) lastField = t;
-    });
     return form;
   }
 
@@ -537,14 +496,15 @@ var DEFAULTS = {
     ]);
 
     sheet = el('article', { class: 'cc-sheet', 'aria-label': 'Εκτυπώσιμη κάρτα συμβάσεων' });
-    root.appendChild(el('p', { class: 'meta cc-hint', text: 'Τα στοιχεία αποθηκεύονται αυτόματα σε αυτή τη συσκευή και δεν στέλνονται πουθενά. Για να τα έχετε αλλού, κατεβάστε το αρχείο ή στείλτε τον σύνδεσμο. Το κουμπί «Εκτύπωση / PDF» τυπώνει μόνο την κάρτα: διαλέξτε «Αποθήκευση ως PDF» αν θέλετε αρχείο.' }));
+    root.appendChild(el('p', { class: 'meta cc-hint', text: 'Τα στοιχεία αποθηκεύονται αυτόματα σε αυτή τη συσκευή και δεν στέλνονται πουθενά. Για να τα έχετε αλλού, κατεβάστε το αρχείο ή στείλτε τον σύνδεσμο.' }));
+    root.appendChild(HBSuits.help());
     root.appendChild(banner);
     root.appendChild(actions);
-    root.appendChild(symbolBar());
     root.appendChild(buildForm());
     root.appendChild(el('h2', { class: 'cc-preview-title', text: 'Προεπισκόπηση κάρτας' }));
     root.appendChild(sheet);
     root.appendChild(el('div', { id: 'cc-toast', class: 'cc-toast', role: 'status', hidden: '' }));
+    HBSuits.init(root);
     fill();
     setBanner(shared);
   }

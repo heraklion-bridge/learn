@@ -307,6 +307,20 @@ html.js body:not(.ready) main.page { opacity: 0; animation: reveal 0s 1.5s forwa
 .cc-sym.rs { color: var(--red); }
 .cc-sym:hover { border-color: var(--teal); background: var(--accent-soft); }
 .cc-sym-hint { margin-left: auto; font-size: 13px; color: var(--muted); }
+.cc-sym.nt { width: auto; padding: 0 12px; font-size: 15px; font-weight: 700; color: var(--teal-dark); }
+.cc-help { margin: 0 0 14px; }
+.cc-quick { font-size: 14px; color: var(--muted); }
+.cc-quick b { display: inline-block; padding: 1px 7px; border: 1px solid #cdd8d1; border-radius: 6px; background: #fff; color: var(--head); font-weight: 600; }
+.cc-q { width: 26px; height: 26px; margin-left: 8px; border: 1.5px solid #cdd8d1; border-radius: 50%; background: #fff; color: var(--teal-dark); font: inherit; font-size: 14px; font-weight: 700; line-height: 1; cursor: pointer; vertical-align: middle; }
+.cc-q:hover, .cc-q.on { border-color: var(--teal); background: var(--accent-soft); }
+.cc-help-body { margin: 10px 0 0; padding: 12px 16px; border-radius: 10px; background: #f4f7f5; font-size: 14.5px; }
+.cc-help-body[hidden] { display: none; }
+.cc-help-body p { margin: 0 0 8px; }
+.cc-help-body h3 { margin: 10px 0 4px; font-size: .95rem; }
+.cc-help-body ul { margin: 0; padding-left: 1.2em; }
+.cc-help-body li { margin: 3px 0; }
+.hb-suits { position: fixed; z-index: 90; display: flex; gap: 6px; padding: 6px; background: #fff; border: 1px solid var(--line); border-radius: 12px; box-shadow: 0 6px 20px rgba(0, 0, 0, .18); }
+.hb-suits[hidden] { display: none; }
 .cc-preview-title { margin: 30px 0 10px; }
 .cc-sheet { padding: 26px 28px 20px; background: #fff; border: 1.5px solid #cdd8d1; border-radius: 6px; box-shadow: var(--shadow); }
 .cc-sheet-head { text-align: center; padding-bottom: 12px; margin-bottom: 14px; border-bottom: 3px double var(--teal-dark); }
@@ -398,7 +412,7 @@ html.js body:not(.ready) main.page { opacity: 0; animation: reveal 0s 1.5s forwa
 @media print {
   @page { margin: 12mm; }
   body { background: #fff; }
-  .rail, .side, .page-head, .site-footer, .skip, .cc-symbols, .cc-editor, .cc-actions, .cc-hint, .cc-preview-title, .cc-toast, #cc-banner, .shell > .shell-in > .shell-cols > :not(main) { display: none !important; }
+  .rail, .side, .page-head, .site-footer, .skip, .hb-suits, .cc-help, .cc-symbols, .cc-editor, .cc-actions, .cc-hint, .cc-preview-title, .cc-toast, #cc-banner, .shell > .shell-in > .shell-cols > :not(main) { display: none !important; }
   .shell { margin: 0; padding: 0; min-height: 0; }
   main.page { padding: 0; box-shadow: none; background: none; }
   main.page > :not(#cc):not(#sy) { display: none !important; }

@@ -14,7 +14,6 @@
 
   var KEY = 'hbc-system-v1';
   var MAX_NODES = 500, MAX_DEPTH = 24;
-  var SUITS = { s: '♠', h: '♥', d: '♦', c: '♣' };
   var root = document.getElementById('sy');
   if (!root) return;
 
@@ -22,7 +21,6 @@
   var shared = false;      // true όταν βλέπουμε σύστημα από σύνδεσμο (δεν αποθηκεύεται αυτόματα)
   var view = 'tree';       // 'tree' | 'table'
   var editing = null, editingArr = null;   // ο κόμβος που επεξεργαζόμαστε και η λίστα που τον περιέχει
-  var lastField = null;    // το τελευταίο πεδίο κειμένου με εστίαση (για τα σύμβολα)
   var ui = {};
 
   /* Παράδειγμα για το κουμπί «Παράδειγμα»: [δήλωση, σημασία, [παιδιά]] */
@@ -92,39 +90,6 @@
     try { return clean(JSON.parse(localStorage.getItem(KEY) || '{}')); } catch (e) { return clean({}); }
   }
 
-  /* ---------- σύμβολα τράπουλας ---------- */
-  function insertAt(input, text) {
-    var s = input.selectionStart == null ? input.value.length : input.selectionStart;
-    var e = input.selectionEnd == null ? s : input.selectionEnd;
-    input.value = input.value.slice(0, s) + text + input.value.slice(e);
-    input.setSelectionRange(s + text.length, s + text.length);
-    input.dispatchEvent(new Event('input', { bubbles: true }));
-  }
-  function shortcuts(input) {            // !s !h !d !c → ♠ ♥ ♦ ♣, με σωστή θέση του δρομέα
-    var re = /!([shdc])/gi;
-    if (!re.test(input.value)) return;
-    var pos = input.selectionStart == null ? input.value.length : input.selectionStart;
-    var conv = function (t) { return t.replace(/!([shdc])/gi, function (m, l) { return SUITS[l.toLowerCase()]; }); };
-    var before = conv(input.value.slice(0, pos));
-    input.value = before + conv(input.value.slice(pos));
-    input.setSelectionRange(before.length, before.length);
-  }
-  function symbolBar() {
-    var bar = el('div', { class: 'cc-symbols', role: 'group', 'aria-label': 'Σύμβολα τράπουλας' }, [el('span', { class: 'cc-sym-label', text: 'Σύμβολα' })]);
-    [['s', 'Πίκα'], ['h', 'Κούπα'], ['d', 'Καρό'], ['c', 'Σπαθί']].forEach(function (x) {
-      var b = el('button', { type: 'button', class: 'cc-sym' + (x[0] === 'h' || x[0] === 'd' ? ' rs' : ''), 'aria-label': 'Εισαγωγή: ' + x[1], title: x[1] + ' (!' + x[0] + ')', text: SUITS[x[0]] });
-      b.addEventListener('mousedown', function (e) { e.preventDefault(); });   // το πεδίο κρατά την εστίαση
-      b.addEventListener('click', function () {
-        if (!lastField || !document.body.contains(lastField)) { toast('Πατήστε πρώτα μέσα σε ένα πεδίο κειμένου.'); return; }
-        lastField.focus();
-        insertAt(lastField, SUITS[x[0]]);
-      });
-      bar.appendChild(b);
-    });
-    bar.appendChild(el('span', { class: 'cc-sym-hint', text: 'ή γράψτε !s !h !d !c' }));
-    return bar;
-  }
-
   /* ---------- δέντρο (επεξεργασία) ---------- */
   function updateCount() {
     var n = total(data.nodes);
@@ -185,18 +150,17 @@
     row.appendChild(tog);
 
     if (editing === n) {
-      var bi = el('input', { type: 'text', class: 'sy-bid-in', maxlength: '24', placeholder: 'Δήλωση, π.χ. 1♣', 'aria-label': 'Δήλωση' });
+      var bi = el('input', { type: 'text', class: 'sy-bid-in', maxlength: '24', placeholder: 'π.χ. 1σπ ή 1c → 1♣', 'aria-label': 'Δήλωση' });
       var mi = el('input', { type: 'text', class: 'sy-m-in', maxlength: '300', placeholder: 'Τι σημαίνει (προαιρετικά)', 'aria-label': 'Σημασία' });
       bi.value = n.b; mi.value = n.m;
       [bi, mi].forEach(function (inp) {
-        inp.addEventListener('focus', function () { lastField = inp; });
         inp.addEventListener('keydown', function (e) {
           if (e.key === 'Escape') { e.preventDefault(); finishEdit(); }
           else if (e.key === 'Enter') { e.preventDefault(); if (inp === bi) mi.focus(); else finishEdit(); }
         });
       });
-      bi.addEventListener('input', function () { shortcuts(bi); n.b = bi.value; save(); updateCount(); });
-      mi.addEventListener('input', function () { shortcuts(mi); n.m = mi.value; save(); });
+      bi.addEventListener('input', function () { n.b = bi.value; save(); updateCount(); });
+      mi.addEventListener('input', function () { n.m = mi.value; save(); });
       row.appendChild(bi); row.appendChild(mi);
       row.appendChild(iconBtn('Τέλος επεξεργασίας', '✓', finishEdit, 'ok'));
     } else {
@@ -411,7 +375,6 @@
 
     ui.name = el('input', { type: 'text', id: 'sy-name', maxlength: '80', placeholder: 'π.χ. Standard 5φ μαζέρ – Μάνος και Γιάννης' });
     ui.name.addEventListener('input', function () { data.name = ui.name.value; save(); if (view === 'table') renderSheet(); });
-    ui.name.addEventListener('focus', function () { lastField = ui.name; });
 
     ui.tabTree = el('button', { type: 'button', class: 'sy-tab on', 'aria-pressed': 'true', text: 'Δέντρο' });
     ui.tabTable = el('button', { type: 'button', class: 'sy-tab', 'aria-pressed': 'false', text: 'Πίνακας' });
@@ -435,17 +398,19 @@
     ]);
 
     var uiBox = el('div', { class: 'sy-ui' }, [
-      el('p', { class: 'meta cc-hint', text: 'Τα στοιχεία αποθηκεύονται αυτόματα σε αυτή τη συσκευή και δεν στέλνονται πουθενά. Κάθε δήλωση έχει από κάτω της τις απαντήσεις. Οι αντίπαλοι θεωρούνται πάσο, εκτός αν γράψετε τη δήλωσή τους σε παρένθεση, π.χ. (1♠). Για να τα έχετε και αλλού, χρησιμοποιήστε «Λήψη αρχείου» ή «Σύνδεσμος κοινοποίησης».' }),
-      ui.banner, actions, symbolBar(), nameBox, tabsBar, ui.treeWrap
+      el('p', { class: 'meta cc-hint', text: 'Τα στοιχεία αποθηκεύονται αυτόματα σε αυτή τη συσκευή και δεν στέλνονται πουθενά. Για να τα έχετε και αλλού, χρησιμοποιήστε «Λήψη αρχείου» ή «Σύνδεσμος κοινοποίησης».' }),
+      el('p', { class: 'meta cc-hint', text: 'Κάθε δήλωση έχει από κάτω της τις απαντήσεις: με το ＋ προσθέτετε απάντηση, με το ✎ αλλάζετε τη δήλωση ή τη σημασία της. Η ακολουθία διαβάζεται από πάνω προς τα κάτω. Οι αντίπαλοι θεωρούνται πάσο, εκτός αν γράψετε τη δήλωσή τους σε παρένθεση, π.χ. (1♠).' }),
+      HBSuits.help([
+        'Στο πεδίο της δήλωσης αρκεί το επίπεδο και το χρώμα: 1σπ → 1♣, 2κα → 2♦, 3κο → 3♥, 4μπ → 4♠, 3χα → 3NT (πάντα με κενό στο τέλος).',
+        'Στο πεδίο της δήλωσης δουλεύουν και αμέσως τα αγγλικά: 1s → 1♠, 2h → 2♥, 3d → 3♦, 4c → 4♣, 1nt → 1NT.'
+      ]),
+      ui.banner, actions, nameBox, tabsBar, ui.treeWrap
     ]);
     root.appendChild(uiBox);
     root.appendChild(ui.sheet);
     root.appendChild(ui.toast);
 
-    document.addEventListener('focusin', function (e) {
-      var t = e.target;
-      if (t.tagName === 'INPUT' && t.type === 'text' && root.contains(t)) lastField = t;
-    });
+    HBSuits.init(root, { bid: '.sy-bid-in' });
     window.addEventListener('beforeprint', function () { if (editing) finishEdit(); renderSheet(); });
 
     ui.name.value = data.name;
