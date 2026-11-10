@@ -160,7 +160,7 @@
   }
 
   function trumpLabel(t) {
-    return t === 'NT' ? 'Χωρίς ατού (ΧΑ)' : 'Ατού: ' + t + ' (' + SUIT_PL[t] + ')';
+    return t === 'NT' ? 'Χωρίς ατού (NT)' : 'Ατού: ' + t + ' (' + SUIT_PL[t] + ')';
   }
 
   function questionExtras(q) {

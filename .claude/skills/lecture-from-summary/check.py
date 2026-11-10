@@ -65,15 +65,15 @@ def check_unit(slug):
     bad = find(r'[Μμ]άθημα\s*\d|μαθήματος\s*\d|Α΄\s*κύκλ|Φλουρ|Flouris|Flooris', whole)
     report(not bad, 'no teacher name / lesson numbers / cycle labels', ' | '.join(bad))
 
-    # 2. ΧΑ typed with Greek letters only
-    bad = find(r'(?<![A-Za-zΑ-Ωα-ω])(?:XA|ΧA|XΑ)(?![A-Za-zΑ-Ωα-ω])', whole)
-    report(not bad, 'ΧΑ written with Greek letters', ' | '.join(bad))
+    # 2. notrump is written NT (Latin letters), never ΧΑ / ΝΤ / mixed-script lookalikes
+    bad = find(r'(?<![A-Za-zΑ-Ωα-ωΆ-ώ])(?:ΧΑ|XA|ΧA|XΑ|ΝΤ|NΤ|ΝT)(?![A-Za-zΑ-Ωα-ωΆ-ώ])', whole)
+    report(not bad, 'notrump written NT (Latin letters), not ΧΑ / ΝΤ', ' | '.join(bad))
 
     # 3. Greek grammar of bids and of μανς / λεβέ / αντάμ
     g = []
     for name, pat in [
-        ('singular article before a level 2-7 bid', r'\b(?:[Ηη]|[Τ]ην|τη[ν]?|της)\s+[2-7]\s?(?:♣|♦|♠|♥|ΧΑ)'),
-        ('"το/του" before a level 2-7 bid (use οι / τα / τις)', r'\b(?:[Τ]ο|το|του|τον)\s+[2-7]\s?(?:♣|♦|♠|♥|ΧΑ)'),
+        ('singular article before a level 2-7 bid', r'\b(?:[Ηη]|[Τ]ην|τη[ν]?|της)\s+[2-7]\s?(?:♣|♦|♠|♥|NT)'),
+        ('"το/του" before a level 2-7 bid (use οι / τα / τις)', r'\b(?:[Τ]ο|το|του|τον)\s+[2-7]\s?(?:♣|♦|♠|♥|NT)'),
         ('οι/τις before clubs/diamonds (σπαθιά, καρά are τα)', r'\b(?:[Οο]ι|τις)\s+[2-7]\s?(?:♣|♦)'),
         ('τα before hearts/spades (κούπες, πίκες are οι)', r'\b(?:[Τ]α|τα)\s+[2-7]\s?(?:♥|♠)'),
         ('μανς is feminine (η μανς)', r'\b(?:[Τ]ο|το|του|τον|ένα|ίδιο)\s+(?:[α-ωά-ώ]+\s+)?μανς'),

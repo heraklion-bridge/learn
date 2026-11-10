@@ -290,6 +290,9 @@ html.js body:not(.ready) main.page { opacity: 0; animation: reveal 0s 1.5s forwa
 .cc-conv-item input[type=text] { display: none; margin-top: 6px; }
 .cc-conv-item.on input[type=text] { display: block; }
 .cc-sub-h { margin: 22px 0 8px; font-size: 1rem; }
+.cc-group-h { margin: 18px 0 4px; color: var(--teal-dark); }
+.cc-groups > .cc-group-h:first-child { margin-top: 4px; }
+.cc-other { margin-top: 8px; }
 .cc-custom { display: flex; flex-direction: column; gap: 8px; margin: 0 0 10px; }
 .cc-custom-row { display: grid; grid-template-columns: minmax(150px, 1fr) 2fr 40px; gap: 8px; align-items: center; }
 .cc-custom-row input[type=text] { width: 100%; padding: 9px 11px; border: 1.5px solid #cdd8d1; border-radius: 8px; background: #fff; font: inherit; font-size: 15px; color: var(--ink); }

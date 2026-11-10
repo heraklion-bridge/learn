@@ -7,10 +7,12 @@
 
    Τι θα αλλάζετε συχνότερα, αμέσως από κάτω:
      • SECTIONS     → τα πεδία της φόρμας (στα ελληνικά).
-     • CONVENTIONS  → η λίστα των συμβάσεων με τα τικ (τα ονόματα των συμβάσεων μένουν στα αγγλικά).
+     • CONV_GROUPS  → οι συμβάσεις ανά κατηγορία με τα τικ (τα ονόματα των συμβάσεων μένουν στα αγγλικά).
      • DEFAULTS     → οι «τυπικές τιμές» του κουμπιού «Συμπλήρωση με τυπικές τιμές».
    Ο χρήστης μπορεί επιπλέον να προσθέσει δικές του συμβάσεις από τη φόρμα.
    ========================================================================== */
+
+var OTHER = 'Άλλο (γράψτε παρακάτω)';   // όταν επιλεγεί, εμφανίζεται πεδίο να γράψει ο χρήστης ό,τι θέλει
 
 var SECTIONS = [
   { title: 'Το ζευγάρι', cols: 2, fields: [
@@ -20,54 +22,65 @@ var SECTIONS = [
     { id: 'club', label: 'Όμιλος / διοργάνωση', type: 'text' }
   ] },
   { title: 'Ανοίγματα', cols: 2, fields: [
-    { id: 'nt1', label: 'Άνοιγμα 1ΧΑ (πόντοι)', type: 'text', ph: 'π.χ. 15–17' },
-    { id: 'nt2', label: 'Άνοιγμα 2ΧΑ (πόντοι)', type: 'text', ph: 'π.χ. 20–21' },
-    { id: 'major', label: 'Άνοιγμα 1 σε μαζέρ', type: 'select', opts: ['5φ μαζέρ (5+ φύλλα)', '4φ μαζέρ (4+ φύλλα)', 'Άλλο (βλ. σημειώσεις)'] },
-    { id: 'minor', label: 'Άνοιγμα 1 σε μινέρ', type: 'select', opts: ['Μακρύτερο μινέρ', 'Καλύτερο μινέρ (3+ φύλλα)', 'Άλλο (βλ. σημειώσεις)'] },
-    { id: 'c2', label: 'Άνοιγμα 2♣', type: 'select', opts: ['Ισχυρό, αναγκαστικό', 'Φυσικό', 'Άλλο (βλ. σημειώσεις)'] },
-    { id: 'w2d', label: 'Άνοιγμα 2♦', type: 'select', opts: ['Αδύναμο (6 φύλλα)', 'Ισχυρό', 'Multi', 'Δεν παίζουμε', 'Άλλο (βλ. σημειώσεις)'] },
-    { id: 'w2h', label: 'Άνοιγμα 2♥', type: 'select', opts: ['Αδύναμο (6 φύλλα)', 'Ισχυρό', 'Δεν παίζουμε', 'Άλλο (βλ. σημειώσεις)'] },
-    { id: 'w2s', label: 'Άνοιγμα 2♠', type: 'select', opts: ['Αδύναμο (6 φύλλα)', 'Ισχυρό', 'Δεν παίζουμε', 'Άλλο (βλ. σημειώσεις)'] },
+    { id: 'nt1', label: 'Άνοιγμα 1NT (πόντοι)', type: 'text', ph: 'π.χ. 15–17' },
+    { id: 'nt2', label: 'Άνοιγμα 2NT (πόντοι)', type: 'text', ph: 'π.χ. 20–21' },
+    { id: 'major', label: 'Άνοιγμα 1 σε μαζέρ', type: 'select', opts: ['5φ μαζέρ (5+ φύλλα)', '4φ μαζέρ (4+ φύλλα)', OTHER] },
+    { id: 'minor', label: 'Άνοιγμα 1 σε μινέρ', type: 'select', opts: ['Μακρύτερο μινέρ', 'Καλύτερο μινέρ (3+ φύλλα)', OTHER] },
+    { id: 'c2', label: 'Άνοιγμα 2♣', type: 'select', opts: ['Ισχυρό, αναγκαστικό', 'Φυσικό', OTHER] },
+    { id: 'w2d', label: 'Άνοιγμα 2♦', type: 'select', opts: ['Αδύναμο (6 φύλλα)', 'Ισχυρό', 'Multi', 'Δεν παίζουμε', OTHER] },
+    { id: 'w2h', label: 'Άνοιγμα 2♥', type: 'select', opts: ['Αδύναμο (6 φύλλα)', 'Ισχυρό', 'Δεν παίζουμε', OTHER] },
+    { id: 'w2s', label: 'Άνοιγμα 2♠', type: 'select', opts: ['Αδύναμο (6 φύλλα)', 'Ισχυρό', 'Δεν παίζουμε', OTHER] },
     { id: 'pre3', label: 'Φραγμοί (επίπεδο 3 και πάνω)', type: 'text', ph: 'π.χ. 7 φύλλα, 5–9 πόντοι', wide: true }
   ] },
   { title: 'Απαντήσεις και παρεμβολές', fields: [
-    { id: 'rNT', label: 'Απαντήσεις στο 1ΧΑ', type: 'text', ph: 'π.χ. Stayman, Jacoby Transfers' },
-    { id: 'rMaj', label: 'Απαντήσεις στο 1 σε μαζέρ', type: 'text', ph: 'π.χ. 1ΧΑ = 6–9 πόντοι, ανέβασμα με 3 φύλλα' },
+    { id: 'rNT', label: 'Απαντήσεις στο 1NT', type: 'text', ph: 'π.χ. Stayman, Jacoby Transfers' },
+    { id: 'rMaj', label: 'Απαντήσεις στο 1 σε μαζέρ', type: 'text', ph: 'π.χ. 1NT = 6–9 πόντοι, ανέβασμα με 3 φύλλα' },
     { id: 'rMin', label: 'Απαντήσεις στο 1 σε μινέρ', type: 'text', ph: 'π.χ. πρώτα το 4φ μαζέρ' },
     { id: 'oc1', label: 'Παρεμβολή στο επίπεδο 1', type: 'text', ph: 'π.χ. 8–16 πόντοι, 5+ φύλλα' },
     { id: 'oc2', label: 'Παρεμβολή στο επίπεδο 2', type: 'text', ph: 'π.χ. 11–16 πόντοι, 5+ φύλλα' },
-    { id: 'ocNT', label: 'Παρεμβολή 1ΧΑ', type: 'text', ph: 'π.χ. 15–18 πόντοι, στοπ' },
+    { id: 'ocNT', label: 'Παρεμβολή 1NT', type: 'text', ph: 'π.χ. 15–18 πόντοι, στοπ' },
     { id: 'dbl', label: 'Double', type: 'text', ph: 'π.χ. Takeout· Negative Double έως 3♠' }
   ] },
   { title: 'Άμυνα και σινιάλα', cols: 2, fields: [
-    { id: 'leadNT', label: 'Αντάμ έναντι ΧΑ', type: 'select', opts: ['4ο καλύτερο', '3ο και 5ο καλύτερο', 'Άλλο (βλ. σημειώσεις)'] },
-    { id: 'leadSuit', label: 'Αντάμ έναντι χρώματος', type: 'select', opts: ['4ο καλύτερο', '3ο και 5ο καλύτερο', 'Άλλο (βλ. σημειώσεις)'] },
-    { id: 'sigAtt', label: 'Σινιάλο διάθεσης', type: 'select', opts: ['Κανονικό (μεγάλο φύλλο = θέλω)', 'Ανάποδο (μικρό φύλλο = θέλω)'] },
-    { id: 'sigCount', label: 'Αριθμητικό σινιάλο', type: 'select', opts: ['Κανονικό (μεγάλο–μικρό = ζυγός αριθμός)', 'Ανάποδο (μικρό–μεγάλο = ζυγός αριθμός)'] },
+    { id: 'leadNT', label: 'Αντάμ έναντι NT', type: 'select', opts: ['4ο καλύτερο', '3ο και 5ο καλύτερο', OTHER] },
+    { id: 'leadSuit', label: 'Αντάμ έναντι χρώματος', type: 'select', opts: ['4ο καλύτερο', '3ο και 5ο καλύτερο', OTHER] },
+    { id: 'sigAtt', label: 'Σινιάλο διάθεσης', type: 'select', opts: ['Κανονικό (μεγάλο φύλλο = θέλω)', 'Ανάποδο (μικρό φύλλο = θέλω)', OTHER] },
+    { id: 'sigCount', label: 'Αριθμητικό σινιάλο', type: 'select', opts: ['Κανονικό (μεγάλο–μικρό = ζυγός αριθμός)', 'Ανάποδο (μικρό–μεγάλο = ζυγός αριθμός)', OTHER] },
     { id: 'honors', label: 'Αντάμ από σύνθεση ονέρ', type: 'text', ph: 'π.χ. K από AK, Q από QJ' },
     { id: 'sigSuit', label: 'Σινιάλο προτίμησης χρώματος', type: 'text', ph: 'π.χ. Lavinthal, Smith echo' }
   ] }
 ];
 
-var CONVENTIONS = [
-  ['stayman', 'Stayman'], ['transfers', 'Jacoby Transfers'], ['texas', 'Texas Transfers'],
-  ['puppet', 'Puppet Stayman'], ['smolen', 'Smolen'], ['minorstayman', 'Minor Suit Stayman'], ['rangeask', 'Range Ask'],
-  ['blackwood', 'Blackwood'], ['gerber', 'Gerber'], ['cue', 'Cue Bids'],
-  ['splinter', 'Splinter'], ['jacoby2', 'Jacoby 2NT'], ['bergen', 'Bergen Raises'],
-  ['inverted', 'Inverted Minors'], ['drury', 'Drury'], ['checkback', 'Checkback'],
-  ['fsf', 'Fourth Suit Forcing'], ['twoway', 'Two-Way Game Try'], ['serious3', 'Serious 3NT'],
-  ['negdbl', 'Negative Double'], ['takeout', 'Takeout Double'], ['support', 'Support Double'], ['responsive', 'Responsive Double'],
-  ['michaels', 'Michaels Cue Bid'], ['unusual', 'Unusual 2NT'], ['lebensohl', 'Lebensohl'],
-  ['landy', 'Landy'], ['wjs', 'Weak Jump Shifts'], ['dopi', 'DOPI / DEPO']
+// Οι κατηγορίες φαίνονται μόνο στη φόρμα· στην κάρτα και στο PDF οι συμβάσεις είναι μία λίστα.
+var CONV_GROUPS = [
+  ['Ανοίγματα και απαντήσεις', [
+    ['splinter', 'Splinter'], ['jacoby2', 'Jacoby 2NT'], ['bergen', 'Bergen Raises'],
+    ['inverted', 'Inverted Minors'], ['drury', 'Drury'], ['wjs', 'Weak Jump Shifts']
+  ]],
+  ['Μετά από άνοιγμα NT', [
+    ['stayman', 'Stayman'], ['transfers', 'Jacoby Transfers'], ['texas', 'Texas Transfers'],
+    ['puppet', 'Puppet Stayman'], ['smolen', 'Smolen'], ['minorstayman', 'Minor Suit Stayman'], ['rangeask', 'Range Ask']
+  ]],
+  ['Slam bidding', [
+    ['blackwood', 'Blackwood'], ['gerber', 'Gerber'], ['cue', 'Cue Bids'], ['serious3', 'Serious 3NT'], ['dopi', 'DOPI / DEPO']
+  ]],
+  ['Παρεμβολές και Double', [
+    ['negdbl', 'Negative Double'], ['takeout', 'Takeout Double'], ['support', 'Support Double'], ['responsive', 'Responsive Double'],
+    ['michaels', 'Michaels Cue Bid'], ['unusual', 'Unusual 2NT'], ['lebensohl', 'Lebensohl'], ['landy', 'Landy']
+  ]],
+  ['Διάφορες', [
+    ['checkback', 'Checkback'], ['fsf', 'Fourth Suit Forcing'], ['twoway', 'Two-Way Game Try']
+  ]]
 ];
+var CONVENTIONS = CONV_GROUPS.reduce(function (all, g) { return all.concat(g[1]); }, []);
 
 var DEFAULTS = {
-  p1: 'Παίκτης 1', p2: 'Παίκτης 2', system: '5φ μαζέρ, 1ΧΑ 15–17', club: 'Όμιλος Μπριτζ Ηρακλείου',
+  p1: 'Παίκτης 1', p2: 'Παίκτης 2', system: '5φ μαζέρ, 1NT 15–17', club: 'Όμιλος Μπριτζ Ηρακλείου',
   nt1: '15–17', nt2: '20–21', major: '5φ μαζέρ (5+ φύλλα)', minor: 'Μακρύτερο μινέρ', c2: 'Ισχυρό, αναγκαστικό', w2d: 'Αδύναμο (6 φύλλα)', w2h: 'Αδύναμο (6 φύλλα)', w2s: 'Αδύναμο (6 φύλλα)',
   pre3: '7 φύλλα, 5–9 πόντοι',
-  rNT: 'Stayman, Jacoby Transfers', rMaj: '1ΧΑ = 6–9 πόντοι, ανέβασμα με 3 φύλλα', rMin: 'Πρώτα το 4φ μαζέρ',
+  rNT: 'Stayman, Jacoby Transfers', rMaj: '1NT = 6–9 πόντοι, ανέβασμα με 3 φύλλα', rMin: 'Πρώτα το 4φ μαζέρ',
   oc1: '8–16 πόντοι, 5+ φύλλα', oc2: '11–16 πόντοι, 5+ φύλλα', ocNT: '15–18 πόντοι, στοπ', dbl: 'Takeout· Negative Double έως 3♠',
-  leadNT: '4ο καλύτερο', leadSuit: '4ο καλύτερο', sigAtt: 'Κανονικό (μεγάλο φύλλο = θέλω)', sigCount: 'Κανονικό (μεγάλο–μικρό = ζυγός αριθμός)',
+  leadNT: '4ο καλύτερο', leadSuit: '4ο καλύτερο', sigAtt: 'Ανάποδο (μικρό φύλλο = θέλω)', sigCount: 'Ανάποδο (μικρό–μεγάλο = ζυγός αριθμός)',
   honors: 'K από AK, Q από QJ', sigSuit: 'Lavinthal',
   conv: { stayman: '', transfers: '', blackwood: '1430', negdbl: 'έως 3♠', takeout: '', michaels: '', unusual: '', jacoby2: '' }
 };
@@ -106,7 +119,7 @@ var DEFAULTS = {
   }
   var knownKeys = (function () {
     var k = { notes: 1, custom: 1 };
-    SECTIONS.forEach(function (s) { s.fields.forEach(function (f) { k[f.id] = 1; }); });
+    SECTIONS.forEach(function (s) { s.fields.forEach(function (f) { k[f.id] = 1; if (f.type === 'select') k['o:' + f.id] = 1; }); });
     CONVENTIONS.forEach(function (c) { k['c:' + c[0]] = 1; k['n:' + c[0]] = 1; });
     return k;
   })();
@@ -125,12 +138,18 @@ var DEFAULTS = {
       Object.keys(obj).forEach(function (k) {
         if (!knownKeys[k] || typeof obj[k] !== 'string') return;
         if (k === 'custom') { var l = parseCustom(obj[k]); if (l.length) out[k] = JSON.stringify(l); }
-        else out[k] = obj[k].slice(0, 2000);
+        else out[k] = obj[k] === 'Άλλο (βλ. σημειώσεις)' ? OTHER : obj[k].slice(0, 2000);
       });
     }
     return out;
   }
   function isEmpty(s) { return !Object.keys(s).some(function (k) { return s[k]; }); }
+  function isOther(v) { return String(v || '').indexOf('Άλλο') === 0; }
+  function fieldValue(f) {               // η τιμή ενός πεδίου όπως φαίνεται στην κάρτα (το «Άλλο» δείχνει ό,τι έγραψε ο χρήστης)
+    var v = state[f.id];
+    if (isOther(v)) return String(state['o:' + f.id] || '').trim() || 'Άλλο';
+    return v || '';
+  }
 
   /* ---------- αποθήκευση ---------- */
   function save() {
@@ -189,6 +208,7 @@ var DEFAULTS = {
       renderSheet();
     });
   }
+  var otherSync = {};   // id -> συνάρτηση που δείχνει/κρύβει το πεδίο «Άλλο»
   function field(f) {
     var id = 'cc-' + f.id, input;
     if (f.type === 'select') {
@@ -198,7 +218,16 @@ var DEFAULTS = {
       if (f.ph) input.placeholder = f.ph;
     }
     bind(input, f.id);
-    return el('div', { class: 'cc-field' + (f.wide ? ' wide' : '') }, [el('label', { for: id, text: f.label }), input]);
+    var kids = [el('label', { for: id, text: f.label }), input];
+    if (f.type === 'select' && f.opts.some(isOther)) {
+      var other = el('input', { id: id + '-other', type: 'text', class: 'cc-other', maxlength: '200', placeholder: 'Γράψτε εδώ τι παίζετε', 'aria-label': f.label + ': άλλο' });
+      bind(other, 'o:' + f.id);
+      otherSync[f.id] = function () { other.hidden = !isOther(input.value); };
+      input.addEventListener('input', otherSync[f.id]);
+      otherSync[f.id]();
+      kids.push(other);
+    }
+    return el('div', { class: 'cc-field' + (f.wide ? ' wide' : '') }, kids);
   }
   var customBox;
   function renderCustom() {
@@ -233,15 +262,20 @@ var DEFAULTS = {
         el('div', { class: 'cc-fields' + (s.cols === 2 ? ' two' : '') }, s.fields.map(field))
       ]));
     });
-    var list = el('div', { class: 'cc-conv' });
-    CONVENTIONS.forEach(function (c) {
-      var cb = el('input', { type: 'checkbox', id: 'cc-c-' + c[0] });
-      var note = el('input', { type: 'text', 'aria-label': 'Σημείωση για: ' + c[1], placeholder: 'σημείωση (προαιρετικό)', maxlength: '200' });
-      var item = el('div', { class: 'cc-conv-item' }, [el('label', { for: 'cc-c-' + c[0] }, [cb, el('span', { text: c[1] })]), note]);
-      convItems['c:' + c[0]] = item;
-      bind(cb, 'c:' + c[0]);
-      bind(note, 'n:' + c[0]);
-      list.appendChild(item);
+    var list = el('div', { class: 'cc-groups' });
+    CONV_GROUPS.forEach(function (g) {
+      var box = el('div', { class: 'cc-conv' });
+      g[1].forEach(function (c) {
+        var cb = el('input', { type: 'checkbox', id: 'cc-c-' + c[0] });
+        var note = el('input', { type: 'text', 'aria-label': 'Σημείωση για: ' + c[1], placeholder: 'σημείωση (προαιρετικό)', maxlength: '200' });
+        var item = el('div', { class: 'cc-conv-item' }, [el('label', { for: 'cc-c-' + c[0] }, [cb, el('span', { text: c[1] })]), note]);
+        convItems['c:' + c[0]] = item;
+        bind(cb, 'c:' + c[0]);
+        bind(note, 'n:' + c[0]);
+        box.appendChild(item);
+      });
+      list.appendChild(el('h3', { class: 'cc-sub-h cc-group-h', text: g[0] }));
+      list.appendChild(box);
     });
     customBox = el('div', { class: 'cc-custom' });
     addBtn = el('button', { type: 'button', class: 'btn btn--outline cc-add', text: '＋ Προσθήκη δικής σας σύμβασης' });
@@ -279,10 +313,10 @@ var DEFAULTS = {
     ]));
     var cols = el('div', { class: 'cc-sheet-cols' });
     SECTIONS.slice(1).forEach(function (s) {
-      var rows = s.fields.filter(function (f) { return state[f.id]; });
+      var rows = s.fields.filter(fieldValue);
       if (!rows.length) return;
       cols.appendChild(el('section', {}, [el('h3', { text: s.title }), el('dl', {}, rows.reduce(function (acc, f) {
-        acc.push(rich(el('dt'), f.label), rich(el('dd'), state[f.id]));
+        acc.push(rich(el('dt'), f.label), rich(el('dd'), fieldValue(f)));
         return acc;
       }, []))]));
     });
@@ -337,8 +371,8 @@ var DEFAULTS = {
   function sheetData() {                // τα περιεχόμενα της κάρτας ως απλές λίστες (όπως στο renderSheet)
     var secs = [];
     SECTIONS.slice(1).forEach(function (s) {
-      var rows = s.fields.filter(function (f) { return state[f.id]; });
-      if (rows.length) secs.push({ title: s.title, kind: 'dl', rows: rows.map(function (f) { return [f.label, state[f.id]]; }) });
+      var rows = s.fields.filter(fieldValue);
+      if (rows.length) secs.push({ title: s.title, kind: 'dl', rows: rows.map(function (f) { return [f.label, fieldValue(f)]; }) });
     });
     var conv = CONVENTIONS.filter(function (c) { return state['c:' + c[0]]; }).map(function (c) { return [c[1], state['n:' + c[0]]]; });
     parseCustom(state.custom).forEach(function (c) { if (c.n.trim()) conv.push([c.n.trim(), c.t.trim()]); });
@@ -511,6 +545,7 @@ var DEFAULTS = {
       var i = inputs[k], v = state[k] || '';
       if (i.type === 'checkbox') { i.checked = !!v; if (convItems[k]) convItems[k].classList.toggle('on', !!v); } else i.value = v;
     });
+    Object.keys(otherSync).forEach(function (k) { otherSync[k](); });
     renderCustom();
     renderSheet();
   }
@@ -522,6 +557,7 @@ var DEFAULTS = {
     history.replaceState(null, '', location.pathname);
   }
   function download() {
+    if (isEmpty(state)) { toast('Η κάρτα είναι κενή, δεν υπάρχει τίποτα να αποθηκευτεί. Συμπληρώστε κάτι και δοκιμάστε ξανά.'); return; }
     var blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
     var a = el('a', { href: URL.createObjectURL(blob), download: 'karta-symvaseon.json' });
     document.body.appendChild(a); a.click(); a.remove();
@@ -531,8 +567,8 @@ var DEFAULTS = {
     var r = new FileReader();
     r.onload = function () {
       try {
-        var data = clean(JSON.parse(r.result));
-        if (isEmpty(data)) throw new Error('empty');
+        var data = clean(JSON.parse(String(r.result).replace(/^\uFEFF/, '')));
+        if (isEmpty(data)) { toast('Η κάρτα του αρχείου είναι κενή: δεν έχει κανένα στοιχείο.'); return; }
         if (!isEmpty(state) && !shared && !window.confirm('Η κάρτα του αρχείου θα αντικαταστήσει αυτήν που έχετε τώρα. Συνέχεια;')) return;
         state = data; leaveShared(); save(); fill();
         toast('Η κάρτα άνοιξε από το αρχείο.');
