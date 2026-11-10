@@ -300,6 +300,203 @@ var DEFAULTS = {
     sheet.appendChild(cols);
   }
 
+  /* ---------- PDF (δημιουργείται στη συσκευή: ίδιο αποτέλεσμα σε υπολογιστή και κινητό) ---------- */
+  var VENDOR = (function () {
+    var s = document.currentScript;
+    return (s && s.src ? s.src.replace(/[^\/]*$/, '') : '') + 'vendor/';
+  })();
+  function loadScript(src) {
+    return new Promise(function (ok, fail) {
+      var t = document.createElement('script');
+      t.src = src; t.onload = ok; t.onerror = function () { fail(new Error('script')); };
+      document.head.appendChild(t);
+    });
+  }
+  function fetchFont(name) {            // γραμματοσειρά → δυαδικό κείμενο, όπως το θέλει η jsPDF
+    return fetch(VENDOR + name).then(function (r) {
+      if (!r.ok) throw new Error('font');
+      return r.arrayBuffer();
+    }).then(function (buf) {
+      var bytes = new Uint8Array(buf), bin = '';
+      for (var i = 0; i < bytes.length; i += 8192) bin += String.fromCharCode.apply(null, bytes.subarray(i, i + 8192));
+      return bin;
+    });
+  }
+  var pdfLibs;
+  function pdfReady() {                 // φορτώνει τη βιβλιοθήκη και τις γραμματοσειρές μόνο όταν χρειαστούν
+    if (!pdfLibs) {
+      pdfLibs = Promise.all([
+        window.jspdf ? 0 : loadScript(VENDOR + 'jspdf.umd.min.js'),
+        fetchFont('DejaVuSans.ttf'), fetchFont('DejaVuSans-Bold.ttf')
+      ]).then(function (r) { return { regular: r[1], bold: r[2] }; });
+      pdfLibs.catch(function () { pdfLibs = null; });
+    }
+    return pdfLibs;
+  }
+
+  function sheetData() {                // τα περιεχόμενα της κάρτας ως απλές λίστες (όπως στο renderSheet)
+    var secs = [];
+    SECTIONS.slice(1).forEach(function (s) {
+      var rows = s.fields.filter(function (f) { return state[f.id]; });
+      if (rows.length) secs.push({ title: s.title, kind: 'dl', rows: rows.map(function (f) { return [f.label, state[f.id]]; }) });
+    });
+    var conv = CONVENTIONS.filter(function (c) { return state['c:' + c[0]]; }).map(function (c) { return [c[1], state['n:' + c[0]]]; });
+    parseCustom(state.custom).forEach(function (c) { if (c.n.trim()) conv.push([c.n.trim(), c.t.trim()]); });
+    if (conv.length) secs.push({ title: 'Συμβάσεις', kind: 'ul', rows: conv });
+    return {
+      pair: [state.p1, state.p2].filter(Boolean).join(' – ') || 'Ονόματα ζευγαριού',
+      sub: [state.system, state.club].filter(Boolean).join(' · '),
+      secs: secs, notes: state.notes || ''
+    };
+  }
+
+  function buildPdf(fonts) {
+    var doc = new window.jspdf.jsPDF({ unit: 'mm', format: 'a4', compress: true });
+    doc.addFileToVFS('DejaVuSans.ttf', fonts.regular);
+    doc.addFileToVFS('DejaVuSans-Bold.ttf', fonts.bold);
+    doc.addFont('DejaVuSans.ttf', 'DejaVu', 'normal');
+    doc.addFont('DejaVuSans-Bold.ttf', 'DejaVu', 'bold');
+    var PW = 210, PH = 297, M = 12, GAP = 9, CW = (PW - 2 * M - GAP) / 2, FULL = PW - 2 * M;
+    var GREEN = [35, 92, 64], MUTED = [107, 122, 114], RED = [198, 40, 40], INK = [20, 28, 24];
+    var PT = 0.3528;                    // 1 pt σε mm
+    var d = sheetData();
+
+    function setFont(bold, size) { doc.setFont('DejaVu', bold ? 'bold' : 'normal'); doc.setFontSize(size); }
+    function lineH(size) { return size * PT * 1.38; }
+    function wrap(runs, size, width) {  // runs: [{t, b}] → γραμμές από τμήματα {t, b}
+      var lines = [[]], x = 0;
+      function put(t, b) {
+        var l = lines[lines.length - 1], last = l[l.length - 1];
+        if (last && last.b === b) last.t += t; else l.push({ t: t, b: b });
+      }
+      runs.forEach(function (r) {
+        setFont(r.b, size);
+        String(r.t).split(/(\s+)/).forEach(function (tok) {
+          if (!tok) return;
+          if (/^\s+$/.test(tok)) {
+            if (tok.indexOf('\n') >= 0) { lines.push([]); x = 0; }
+            else if (x > 0) { put(' ', r.b); x += doc.getTextWidth(' '); }
+            return;
+          }
+          var tw = doc.getTextWidth(tok);
+          if (x + tw > width && x > 0) { lines.push([]); x = 0; }
+          while (tw > width) {          // πολύ μακριά λέξη: κόψιμο σε χαρακτήρες
+            var k = tok.length;
+            while (k > 1 && doc.getTextWidth(tok.slice(0, k)) > width - x) k--;
+            put(tok.slice(0, k), r.b); lines.push([]); x = 0;
+            tok = tok.slice(k); tw = doc.getTextWidth(tok);
+          }
+          put(tok, r.b); x += tw;
+        });
+      });
+      return lines.filter(function (l) { return l.length; }).map(function (l) {
+        var e = l[l.length - 1]; e.t = e.t.replace(/\s+$/, ''); return l;
+      });
+    }
+    function draw(line, x, y, size, color, center, width) {   // μία γραμμή· τα ♥ ♦ βγαίνουν κόκκινα
+      var parts = [], total = 0;
+      line.forEach(function (seg) {
+        setFont(seg.b, size);
+        seg.t.split(/([♥♦])/).forEach(function (t) {
+          if (!t) return;
+          var pw = doc.getTextWidth(t);
+          parts.push({ t: t, b: seg.b, red: t === '♥' || t === '♦', w: pw }); total += pw;
+        });
+      });
+      var cx = center ? x + (width - total) / 2 : x;
+      parts.forEach(function (p) {
+        setFont(p.b, size);
+        doc.setTextColor.apply(doc, p.red ? RED : color);
+        doc.text(p.t, cx, y);
+        cx += p.w;
+      });
+    }
+    function heading(text, x, y0, width) {
+      setFont(true, 10); doc.setTextColor.apply(doc, GREEN);
+      doc.text(text.toUpperCase(), x, y0 + 4.2);
+      doc.setDrawColor.apply(doc, GREEN); doc.setLineWidth(0.35); doc.line(x, y0 + 5.6, x + width, y0 + 5.6);
+    }
+
+    /* επικεφαλίδα */
+    var y = M + 6;
+    setFont(true, 20); doc.setTextColor.apply(doc, GREEN);
+    doc.text('Κάρτα συμβάσεων', PW / 2, y, { align: 'center' });
+    y += 8;
+    wrap([{ t: d.pair, b: true }], 14, FULL).forEach(function (l) { draw(l, M, y, 14, INK, true, FULL); y += lineH(14); });
+    if (d.sub) wrap([{ t: d.sub, b: false }], 10, FULL).forEach(function (l) { draw(l, M, y, 10, MUTED, true, FULL); y += lineH(10); });
+    y += 1;
+    doc.setDrawColor.apply(doc, GREEN); doc.setLineWidth(0.5); doc.line(M, y, PW - M, y);
+    doc.setLineWidth(0.2); doc.line(M, y + 1.1, PW - M, y + 1.1);
+    var top = y + 6, bottom = PH - M;
+
+    /* κάθε ενότητα γίνεται σειρά από «κομμάτια» που δεν σπάνε ανάμεσα σε στήλες */
+    var blocks = [];
+    d.secs.forEach(function (s) {
+      blocks.push({ h: 8, head: true, paint: function (x, y0) { heading(s.title, x, y0, CW); } });
+      s.rows.forEach(function (r, i) {
+        var gap = i === s.rows.length - 1 ? 5 : 0;
+        if (s.kind === 'dl') {
+          var ll = wrap([{ t: r[0], b: true }], 8.5, CW), vl = wrap([{ t: r[1], b: false }], 10, CW);
+          blocks.push({ h: 1.8 + ll.length * lineH(8.5) + vl.length * lineH(10) + gap, paint: function (x, y0) {
+            var yy = y0 + 1.8;
+            ll.forEach(function (l) { yy += lineH(8.5); draw(l, x, yy - 1.1, 8.5, MUTED); });
+            vl.forEach(function (l) { yy += lineH(10); draw(l, x, yy - 1.2, 10, INK); });
+          } });
+        } else {
+          var runs = [{ t: r[0], b: true }];
+          if (r[1]) runs.push({ t: ' – ' + r[1], b: false });
+          var tl = wrap(runs, 10, CW - 4);
+          blocks.push({ h: 1.6 + tl.length * lineH(10) + gap, paint: function (x, y0) {
+            doc.setFillColor.apply(doc, GREEN); doc.circle(x + 1, y0 + 0.8 + lineH(10) - 2.4, 0.45, 'F');
+            var yy = y0 + 0.8;
+            tl.forEach(function (l) { yy += lineH(10); draw(l, x + 4, yy - 1.2, 10, INK); });
+          } });
+        }
+      });
+    });
+
+    /* γέμισμα στηλών· αν όλα χωρούν σε μία σελίδα, οι δύο στήλες ισορροπούν */
+    var total = blocks.reduce(function (a, b) { return a + b.h; }, 0);
+    var target = total <= 2 * (bottom - top) - 10 ? total / 2 + 10 : bottom - top;
+    var col = 0, pageTop = top, ends = [top, top];
+    blocks.forEach(function (b, i) {
+      var nxt = blocks[i + 1], need = b.h + (b.head && nxt ? nxt.h : 0);   // ο τίτλος δεν μένει μόνος στο τέλος στήλης
+      if (ends[col] > pageTop && ends[col] - pageTop + need > target + 0.01) {
+        if (col === 0) col = 1;
+        else { doc.addPage(); col = 0; pageTop = M; ends = [M, M]; target = bottom - M; }
+      }
+      b.paint(M + col * (CW + GAP), ends[col]);
+      ends[col] += b.h;
+    });
+
+    if (d.notes) {                      // οι σημειώσεις σε όλο το πλάτος, κάτω από τις στήλες
+      var ny = Math.max(ends[0], ends[1]) + 3;
+      if (ny + 9 + lineH(10) > bottom) { doc.addPage(); ny = M; }
+      heading('Σημειώσεις', M, ny, FULL);
+      ny += 8.5;
+      wrap([{ t: d.notes, b: false }], 10, FULL).forEach(function (l) {
+        if (ny + lineH(10) > bottom) { doc.addPage(); ny = M; }
+        ny += lineH(10); draw(l, M, ny - 1.2, 10, INK);
+      });
+    }
+    return doc;
+  }
+  var pdfBusy = false;
+  function downloadPdf(b) {
+    if (pdfBusy) return;
+    pdfBusy = true;
+    var old = b.textContent;
+    b.textContent = 'Δημιουργία PDF…'; b.disabled = true;
+    pdfReady().then(function (fonts) {
+      var doc = buildPdf(fonts);
+      doc.setProperties({ title: 'Κάρτα συμβάσεων' });
+      doc.save('karta-symvaseon.pdf');
+      toast('Το PDF δημιουργήθηκε.');
+    }).catch(function () {
+      toast('Δεν μπόρεσε να δημιουργηθεί το PDF. Δοκιμάστε «Εκτύπωση».');
+    }).then(function () { pdfBusy = false; b.textContent = old; b.disabled = false; });
+  }
+
   /* ---------- ενέργειες ---------- */
   var toastTimer;
   function toast(msg) {
@@ -385,8 +582,10 @@ var DEFAULTS = {
       }, 'btn')
     ]);
 
+    var pdfBtn = btn('Λήψη PDF', function () { downloadPdf(pdfBtn); }, 'btn');
     var actions = el('div', { class: 'cc-actions' }, [
-      btn('Εκτύπωση / PDF', function () { window.print(); }, 'btn'),
+      pdfBtn,
+      btn('Εκτύπωση', function () { window.print(); }),
       btn('Συμπλήρωση με τυπικές τιμές', defaults),
       btn('Λήψη αρχείου', download),
       btn('Άνοιγμα αρχείου', function () { fileIn.click(); }),

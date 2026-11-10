@@ -71,7 +71,7 @@ Text rules:
 
 ## Wiring (after the deck exists)
 
-- `lectures/a-kyklos/index.html` (the «Α κύκλος Μαθημάτων» list): add a `<a class="res" href="../<slug>/">` row (copy an existing one: thumbnail `<span class="thumb">` with 2-4 `<span class="tc">` cards that hint at the topic, `<p class="meta">Ενότητα NN · <slide count> διαφάνειες</p>`, `<h3>` title, one-sentence description, `<span class="go">Δείτε τις διαφάνειες →</span>`; rows stay in unit order). Slide count = `grep -c "<section" lectures/<slug>/index.html`. Update the quiz links in the note at the bottom (labels «Κουίζ NN»).
+- `lectures/a-kyklos/index.html` (the «Α κύκλος Μαθημάτων» list): add a `<a class="res" href="../<slug>/">` row (copy an existing one: thumbnail `<span class="thumb">` with 2-4 `<span class="tc">` cards that hint at the topic; write notrump as «ΝΤ» on these thumbnails (1ΝΤ, 3ΝΤ), not «ΧΑ»; use `tc big` for a single large card, never `tc lg`, `<p class="meta">Ενότητα NN · <slide count> διαφάνειες</p>`, `<h3>` title, one-sentence description, `<span class="go">Δείτε τις διαφάνειες →</span>`; rows stay in unit order). Slide count = `grep -c "<section" lectures/<slug>/index.html`. Update the quiz links in the note at the bottom (labels «Κουίζ NN»).
 - `assets/site.js`: add `{ slug: '<slug>', title: '<τίτλος>', kw: '<λέξεις για την αναζήτηση>' }` to `SITE.cycles[0].units` (the sidebar «Μαθήματα → Α κύκλος» / «Quiz → Α' κύκλος» and the search are built from it; position = unit number).
 - `sitemap.xml`: add `https://learn.heraklion-bridge.gr/lectures/<slug>/` after the previous lecture.
 - The deck's back links (`.deck-back` and the last-slide button) go to `../a-kyklos/`; the deck copied from an existing one already has them.
