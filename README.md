@@ -17,6 +17,7 @@ The site has a left icon rail (home, Μαθήματα, Quiz, Για παίκτε
 | `/quiz/<unit>/` | one quiz per unit | `quiz/<unit>/{index.html,questions.js}` |
 | `/paiktes/` | hub for players who finished the lessons or play already. Διανομές, Συμβάσεις, Κουίζ and Υλικό are greyed out as «Σύντομα»; the page is `noindex` and not in the sitemap | `paiktes/index.html` |
 | `/paiktes/karta-symvaseon/` | **Κάρτα συμβάσεων**: a printable convention card builder (form, live preview, print / PDF). No server: it saves in the browser (localStorage), can be saved as a `.json` file, opened from a file or shared as a link (the card is encoded after the `#`, so nothing is sent anywhere). Defaults button, suit symbols (`!s !h !d !c`) and user-added conventions are built in | `paiktes/karta-symvaseon/{index.html,convention-card.js}` |
+| `/paiktes/systimata/` | **Συστήματα**: a bidding-system editor (tree of calls with their meanings and replies, table view, print / PDF). Same approach as the card: saved in the browser, `.json` file or share link (up to 500 calls) | `paiktes/systimata/{index.html,systimata.js}` |
 | `/mathites/`, `/lectures/mathima-1/`, `/lectures/mathima-2/`, `/quiz/mathima-1/`, `/quiz/mathima-2/`, `/quiz/mathima-5/`, `/quiz/mathima-6/` | old addresses that only redirect (links to them were shared); they must stay | `mathites/index.html`, `lectures/mathima-*/`, `quiz/mathima-*/` |
 
 Units are named by topic and numbered 01–08 in teaching order (shown as «Ενότητα NN» in titles and list rows; URLs have no numbers): `vasika-tou-mpritz`, `kanones-agoras`, `epilogi-symvolaiou`, `anoigma-1xa`, `technikes-ektelesis`, `anoigma-1-mazer`, `xemplokarisma-chromatista`, `anoigma-1-miner`.
@@ -32,7 +33,8 @@ Shared parts: `assets/site.js` (rail, «Υλικό» sidebar, search, footer: **
 - **New quiz:** copy `quiz/epilogi-symvolaiou/` to `quiz/<topic-slug>/`, edit `questions.js` and the texts in `index.html`, then add a row to `quiz/a-kyklos/index.html`, an entry to `SITE.cycles` and the address to `sitemap.xml`. Set `next` in the previous quiz's `questions.js` to `{ label: '…', href: 'quiz/<topic-slug>/' }`.
 - **Slides:** each slide is a `<section>…</section>` in `lectures/<unit>/index.html` (units are numbered 01, 02, 03… in teaching order). Building blocks (styled in `lectures/deck.css`): `<div class="example">`, `class="fragment"`, playing cards `<span class="pc">♠K</span>` (add `red` for ♥ ♦). **New deck:** copy `lectures/vasika-tou-mpritz/`, replace the slides, add a row in `lectures/a-kyklos/index.html`, an entry in `SITE.cycles` and the page in `sitemap.xml`. The project skill `lecture-from-summary` (`.claude/skills/`) does all of this from a summary PDF and checks it with `check.py`.
   Shortcuts while viewing: arrows/Space = next/previous, **Esc** = overview, **F** = full screen, **?** = help; add `?print-pdf` to the address to print or save as PDF.
-- **Convention card fields:** the form fields, the list of conventions and the «τυπικές τιμές» (defaults) are the `SECTIONS`, `CONVENTIONS` and `DEFAULTS` lists at the top of `paiktes/karta-symvaseon/convention-card.js`.
+- **Convention card fields:** the form fields, the list of conventions and the «τυπικές τιμές» (defaults) are the `SECTIONS`, `CONV_GROUPS` and `DEFAULTS` lists at the top of `paiktes/karta-symvaseon/convention-card.js`.
+- **PDF:** the card and the systems tool build their PDFs in the browser with `assets/pdf.js` (jsPDF and a DejaVu Sans subset in `assets/vendor/pdf/`, loaded only when a PDF is requested).
 
 ## Preview on your computer
 

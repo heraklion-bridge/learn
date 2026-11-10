@@ -44,7 +44,8 @@ const SITE = {
     ],
     /* σελίδες που βρίσκονται απευθείας κάτω από το «Για παίκτες» */
     pages: [
-      { slug: 'karta-symvaseon', title: 'Κάρτα συμβάσεων', kw: 'κάρτα συμβάσεων convention card εκτύπωση pdf σύστημα σινιάλα' }
+      { slug: 'karta-symvaseon', title: 'Κάρτα συμβάσεων', kw: 'κάρτα συμβάσεων convention card εκτύπωση pdf σύστημα σινιάλα' },
+      { slug: 'systimata', title: 'Συστήματα', kw: 'συστήματα σύστημα αγοράς δέντρο δηλώσεων bidding system εκτύπωση pdf' }
     ]
   },
 
