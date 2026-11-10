@@ -122,9 +122,11 @@ window.HBSuits = (function () {
   function help(extra) {
     function node(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text) e.textContent = text; return e; }
     var box = node('div', 'cc-help');
-    var quick = node('span', 'cc-quick', 'Σύμβολα: ');
-    ['σπ', 'κα', 'κο', 'μπ', 'χα', 'πα'].forEach(function (k) { quick.appendChild(node('b', '', k)); quick.appendChild(document.createTextNode(' ')); });
-    quick.appendChild(document.createTextNode('+ κενό'));
+    var quick = node('span', 'cc-quick', 'Σύμβολα: σπ/κα/κο/μπ/χα/πα + κενό → ');
+    ['♣', '♦', '♥', '♠', 'NT', 'PASS'].forEach(function (x, k) {   // με τη σειρά των λέξεων: σπ ♣, κα ♦, κο ♥, μπ ♠, χα NT, πα PASS
+      if (k) quick.appendChild(document.createTextNode('/'));
+      quick.appendChild(node('span', x === '♦' || x === '♥' ? 'rs' : '', x));
+    });
     var id = 'cc-help-' + Math.random().toString(36).slice(2, 8);
     var q = node('button', 'cc-q', '?');
     q.type = 'button'; q.title = 'Οδηγίες και παραδείγματα';
