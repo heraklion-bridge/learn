@@ -4,30 +4,35 @@ Learning material of the Heraklion Bridge Club (Όμιλος Μπριτζ Ηρα
 
 ## Contents
 
+The site has a left icon rail (home, Μαθήματα, Quiz, Για παίκτες, club site), white cards on an off-white background, and a «Υλικό» sidebar with counts and search on every page. The look follows the bridgetricks.com resource pages.
+
 | URL | What | Files |
 |---|---|---|
-| `/` | home page: two buttons, "Για μαθητές" and "Για παίκτες" | `index.html` |
-| `/mathites/` | hub for students (the first-cycle lessons): buttons to the slides and the quizzes | `mathites/index.html` |
-| `/paiktes/` | hub for players who finished the lessons or play already: four buttons (Διανομές, Συμβάσεις, Κουίζ, Υλικό), all greyed out as «Σύντομα» for now (the page is `noindex` and not in the sitemap). The finished Συμβάσεις (20 pages) and Υλικό pages live on the git branch `paiktes-content` | `paiktes/index.html` |
-| `/lectures/` | lecture slides ([reveal.js](https://revealjs.com) 5.1.0, stored in `lectures/vendor/reveal/`) | `lectures/index.html`, `lectures/<unit>/index.html`, `lectures/deck.css`, `lectures/deck.js` |
-| `/quiz/` | one quiz per unit (`vasika-tou-mpritz`, `kanones-agoras`, `epilogi-symvolaiou`, `anoigma-1xa`, `technikes-ektelesis`, `anoigma-1-mazer`, `xemplokarisma-chromatista`, `anoigma-1-miner` are listed; the old `mathima-5`/`mathima-6` quiz addresses are redirect stubs) | `quiz/index.html`, `quiz/<unit>/{index.html,questions.js}` |
+| `/` | home page: rows for Μαθήματα, Quiz and Για παίκτες | `index.html` |
+| `/lectures/` | central menu **Μαθήματα**: lists the lesson cycles (for now one) | `lectures/index.html` |
+| `/lectures/a-kyklos/` | **Α κύκλος Μαθημάτων**: the eight units with their slide counts | `lectures/a-kyklos/index.html` |
+| `/lectures/<unit>/` | lecture slides ([reveal.js](https://revealjs.com) 5.1.0, stored in `lectures/vendor/reveal/`) | `lectures/<unit>/index.html`, `lectures/deck.css`, `lectures/deck.js` |
+| `/quiz/` | central menu **Quiz**: lists the cycles | `quiz/index.html` |
+| `/quiz/a-kyklos/` | **Quiz Α' Κύκλου Μαθημάτων**: the eight quizzes with their question counts | `quiz/a-kyklos/index.html` |
+| `/quiz/<unit>/` | one quiz per unit | `quiz/<unit>/{index.html,questions.js}` |
+| `/paiktes/` | hub for players who finished the lessons or play already. Διανομές, Συμβάσεις, Κουίζ and Υλικό are greyed out as «Σύντομα»; the page is `noindex` and not in the sitemap | `paiktes/index.html` |
+| `/paiktes/karta-symvaseon/` | **Κάρτα συμβάσεων**: a printable convention card builder (form, live preview, print / PDF). No server: it saves in the browser (localStorage), can be saved as a `.json` file, opened from a file or shared as a link (the card is encoded after the `#`, so nothing is sent anywhere). Defaults button, suit symbols (`!s !h !d !c`) and user-added conventions are built in | `paiktes/karta-symvaseon/{index.html,convention-card.js}` |
+| `/mathites/`, `/lectures/mathima-1/`, `/lectures/mathima-2/`, `/quiz/mathima-1/`, `/quiz/mathima-2/`, `/quiz/mathima-5/`, `/quiz/mathima-6/` | old addresses that only redirect (links to them were shared); they must stay | `mathites/index.html`, `lectures/mathima-*/`, `quiz/mathima-*/` |
 
-Shared parts: `assets/site.js` (top menu and footer – **edit the `menu` and `footer` blocks at the top**), `assets/style.css`, `assets/quiz.js` (the quiz engine).
+Units are named by topic and numbered 01–08 in teaching order (shown as «Ενότητα NN» in titles and list rows; URLs have no numbers): `vasika-tou-mpritz`, `kanones-agoras`, `epilogi-symvolaiou`, `anoigma-1xa`, `technikes-ektelesis`, `anoigma-1-mazer`, `xemplokarisma-chromatista`, `anoigma-1-miner`.
+
+Shared parts: `assets/site.js` (rail, «Υλικό» sidebar, search, footer: **edit `SITE` at the top**), `assets/style.css`, `assets/quiz.js` (the quiz engine), `assets/stats.js` (statistics, see below). The slide decks use only `lectures/deck.css` / `deck.js` and have no rail.
 
 ## Editing
 
-- **Add a button to the home page / a hub:** copy one `<a class="quiz-tile">…</a>` block in `index.html`, `mathites/index.html` or `paiktes/index.html`.
-- **Material for players (`/paiktes/`):** every button on the hub is a `<div class="quiz-tile soon">` placeholder. To publish a section, turn its tile into `<a class="quiz-tile" href="…">`, create the section folder (`paiktes/<section>/…`), add it to the sitemap, and remove the hub's `noindex` when the first section goes live. The ready-made Συμβάσεις and Υλικό sections (with their CSS: `.seq` tables, `.conv-list`, `.level-tag`) are on the branch `paiktes-content`: bring them in with `git checkout paiktes-content -- paiktes assets/style.css` (merge the CSS by hand) and re-add the menu entry if wanted. Slides and quizzes for players can live in `paiktes/<section>/<topic>/` (copy a lecture deck or a quiz folder and fix the `../` paths).
-- **Conventions pages** (on branch `paiktes-content`): one folder per convention, plain HTML; bidding sequences are `<table class="seq">` (rows `<tr class="l1|l2|l3"><th scope="row">bid</th><td>meaning</td></tr>`, `<tr class="sub">` = sub-heading, `<caption>` = table title). Wrap ♥ ♦ in `<span class="rs">`.
-- **Menu:** `menu` list at the top of `assets/site.js`. Addresses starting with `https://` are used as they are (links to the club's site).
+- **Units and cycles:** the sidebar («Μαθήματα → Α κύκλος», «Quiz → Α' κύκλος») and the search are built from `SITE.cycles` at the top of `assets/site.js`. The list pages are plain HTML rows: `<a class="res" href="../<unit>/">` with a CSS thumbnail (`<span class="thumb">` with `<span class="tc">` cards), a `<p class="meta">`, `<h3>`, description and `<span class="go">`. A new *cycle* = a new entry in `SITE.cycles`, a folder like `lectures/a-kyklos/` and `quiz/a-kyklos/`, and one row in each central menu.
+- **Players' area (`/paiktes/`):** rows with `class="res soon"` are placeholders; turn one into `<a class="res" href="…">`, create the folder (`paiktes/<section>/…`) and add it to `SITE.players` in `assets/site.js` (`pages` = pages directly under «Για παίκτες», `sections` = sub-menus with a list of pages). The finished Συμβάσεις (20 pages, with their CSS: `.seq` tables, `.conv-list`, `.level-tag`) and Υλικό pages are kept on the git branch `paiktes-content` (written for the previous design; bring them in with `git checkout paiktes-content -- paiktes`, merge the CSS by hand and adapt the markup to the `res` rows).
+- **Rail and footer:** `SITE.rail` and `SITE.footer` in `assets/site.js`. Addresses starting with `https://` are used as they are (links to the club's site).
 - **Quiz questions:** plain text in `quiz/<unit>/questions.js` (instructions at the top of the file). The page picks changes up automatically.
-- **New quiz:** copy `quiz/epilogi-symvolaiou/` to `quiz/<topic-slug>/`, edit `questions.js` and the texts in `index.html`, then add it to the menu in `assets/site.js` (under "Για μαθητές"), to the list in `quiz/index.html` and to `sitemap.xml`. Set `next` in the previous quiz's `questions.js` to `{ label: '…', href: 'quiz/<topic-slug>/' }`.
-- **Slides:** each slide is a `<section>…</section>` in `lectures/<unit>/index.html` (eight decks exist: `vasika-tou-mpritz`, `kanones-agoras`, `epilogi-symvolaiou`, `anoigma-1xa`, `technikes-ektelesis`, `anoigma-1-mazer`, `xemplokarisma-chromatista`, `anoigma-1-miner`; units are named by topic and numbered 01, 02, 03… in teaching order (shown as «Ενότητα NN» in titles and tile kickers; URLs have no numbers); the old `mathima-1`/`mathima-2` addresses are redirect stubs that must stay, because links to them were shared). Building blocks (styled in `lectures/deck.css`): `<div class="example">`, `class="fragment"`, playing cards `<span class="pc">♠K</span>` (add `red` for ♥ ♦). **New deck:** copy `lectures/mathima-1/`, replace the slides, add a tile in `lectures/index.html` and the page in `sitemap.xml`.
+- **New quiz:** copy `quiz/epilogi-symvolaiou/` to `quiz/<topic-slug>/`, edit `questions.js` and the texts in `index.html`, then add a row to `quiz/a-kyklos/index.html`, an entry to `SITE.cycles` and the address to `sitemap.xml`. Set `next` in the previous quiz's `questions.js` to `{ label: '…', href: 'quiz/<topic-slug>/' }`.
+- **Slides:** each slide is a `<section>…</section>` in `lectures/<unit>/index.html` (units are numbered 01, 02, 03… in teaching order). Building blocks (styled in `lectures/deck.css`): `<div class="example">`, `class="fragment"`, playing cards `<span class="pc">♠K</span>` (add `red` for ♥ ♦). **New deck:** copy `lectures/vasika-tou-mpritz/`, replace the slides, add a row in `lectures/a-kyklos/index.html`, an entry in `SITE.cycles` and the page in `sitemap.xml`. The project skill `lecture-from-summary` (`.claude/skills/`) does all of this from a summary PDF and checks it with `check.py`.
   Shortcuts while viewing: arrows/Space = next/previous, **Esc** = overview, **F** = full screen, **?** = help; add `?print-pdf` to the address to print or save as PDF.
-
-## v2 (new look, work in progress)
-
-`v2/` is a complete copy of the site restyled after the bridgetricks.com resource pages (icon rail on the left, white cards, green palette, «Υλικό» sidebar with counts and search). The left buttons lead to the central menus **Μαθήματα** (`v2/lectures/`) and **Quiz** (`v2/quiz/`); each lists the lesson cycles. The first cycle is **Α κύκλος** (`v2/lectures/a-kyklos/`, titled «Α κύκλος Μαθημάτων») and **Α' κύκλος** (`v2/quiz/a-kyklos/`, titled «Quiz Α' Κύκλου Μαθημάτων»); the unit pages keep their addresses (`v2/lectures/<unit>/`, `v2/quiz/<unit>/`). It is `noindex`, has no statistics script and is not in the sitemap. The sidebar comes from the `SITE.cycles` list at the top of `v2/assets/site.js` (a new cycle = a new entry there plus a new `a-kyklos`-like folder and a row in the two central pages); the lists on the pages are plain HTML (`<a class="res">` rows).
+- **Convention card fields:** the form fields, the list of conventions and the «τυπικές τιμές» (defaults) are the `SECTIONS`, `CONVENTIONS` and `DEFAULTS` lists at the top of `paiktes/karta-symvaseon/convention-card.js`.
 
 ## Preview on your computer
 

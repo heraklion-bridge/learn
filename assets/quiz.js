@@ -346,7 +346,7 @@
 
     var again = el('button', { type: 'button', class: 'btn', text: 'Παίξτε ξανά' });
     again.addEventListener('click', function () { start(); root.scrollIntoView({ block: 'start' }); });
-    var links = [again, el('a', { class: 'btn btn--outline', href: ROOT + 'quiz/', text: 'Όλα τα κουίζ' })];
+    var links = [again, el('a', { class: 'btn btn--outline', href: ROOT + 'quiz/a-kyklos/', text: "Quiz Α' Κύκλου" })];
     if (QUIZ.next) links.push(el('a', { class: 'btn btn--outline', href: ROOT + QUIZ.next.href, text: QUIZ.next.label + ' →' }));
     cardEl.appendChild(el('div', { class: 'btn-row center' }, links));
 

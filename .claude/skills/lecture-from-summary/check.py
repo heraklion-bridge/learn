@@ -4,7 +4,8 @@
 Usage (from the repository root):  python3 .claude/skills/lecture-from-summary/check.py <slug> [<slug> ...]
 Example:                           python3 .claude/skills/lecture-from-summary/check.py epilogi-symvolaiou
 
-It reads lectures/<slug>/index.html, quiz/<slug>/index.html, quiz/<slug>/questions.js and the index pages,
+It reads lectures/<slug>/index.html, quiz/<slug>/index.html, quiz/<slug>/questions.js, the cycle list pages
+(lectures/a-kyklos/index.html, quiz/a-kyklos/index.html) and the sidebar data in assets/site.js,
 and prints PASS / FAIL lines. Exit code 1 if anything fails. It does not replace looking at the slides.
 """
 import os
@@ -110,14 +111,16 @@ def check_unit(slug):
     # 6. counts: slides and questions agree with the tiles and the last slide
     slides = len(re.findall(r'<section', src['deck']))
     questions = len(re.findall(r'^    \{', src['questions'], re.M))
-    li = read('lectures/index.html')
-    qi = read('quiz/index.html')
-    tile_l = re.search(r'href="%s/">\s*<span class="tile-kicker">[^<]*?(\d+) διαφάνειες' % re.escape(slug), li)
-    tile_q = re.search(r'href="%s/">\s*<span class="tile-kicker">[^<]*?(\d+) ερωτήσεις' % re.escape(slug), qi)
-    report(bool(tile_l) and int(tile_l.group(1)) == slides, 'lectures/index.html tile says %d slides' % slides,
-           'tile: %s' % (tile_l.group(1) if tile_l else 'missing'))
-    report(bool(tile_q) and int(tile_q.group(1)) == questions, 'quiz/index.html tile says %d questions' % questions,
-           'tile: %s' % (tile_q.group(1) if tile_q else 'missing'))
+    li = read('lectures/a-kyklos/index.html')
+    qi = read('quiz/a-kyklos/index.html')
+    row = r'<a class="res" href="\.\./%s/">(?:(?!</a>).)*?(\d+) %s'
+    tile_l = re.search(row % (re.escape(slug), 'διαφάνειες'), li, re.S)
+    tile_q = re.search(row % (re.escape(slug), 'ερωτήσεις'), qi, re.S)
+    report(bool(tile_l) and int(tile_l.group(1)) == slides, 'lectures/a-kyklos/index.html row says %d slides' % slides,
+           'row: %s' % (tile_l.group(1) if tile_l else 'missing'))
+    report(bool(tile_q) and int(tile_q.group(1)) == questions, 'quiz/a-kyklos/index.html row says %d questions' % questions,
+           'row: %s' % (tile_q.group(1) if tile_q else 'missing'))
+    report(("slug: '%s'" % slug) in read('assets/site.js'), "assets/site.js lists the unit in SITE.cycles (sidebar and search)")
     last = re.search(r'(\d+) ερωτήσεις', src['deck'])
     report(bool(last) and int(last.group(1)) == questions, 'last slide says %d questions' % questions,
            'slide: %s' % (last.group(1) if last else 'missing'))

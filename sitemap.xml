@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>https://learn.heraklion-bridge.gr/</loc></url>
-  <url><loc>https://learn.heraklion-bridge.gr/mathites/</loc></url>
   <url><loc>https://learn.heraklion-bridge.gr/lectures/</loc></url>
+  <url><loc>https://learn.heraklion-bridge.gr/lectures/a-kyklos/</loc></url>
   <url><loc>https://learn.heraklion-bridge.gr/lectures/vasika-tou-mpritz/</loc></url>
   <url><loc>https://learn.heraklion-bridge.gr/lectures/kanones-agoras/</loc></url>
   <url><loc>https://learn.heraklion-bridge.gr/lectures/epilogi-symvolaiou/</loc></url>
@@ -12,6 +12,7 @@
   <url><loc>https://learn.heraklion-bridge.gr/lectures/xemplokarisma-chromatista/</loc></url>
   <url><loc>https://learn.heraklion-bridge.gr/lectures/anoigma-1-miner/</loc></url>
   <url><loc>https://learn.heraklion-bridge.gr/quiz/</loc></url>
+  <url><loc>https://learn.heraklion-bridge.gr/quiz/a-kyklos/</loc></url>
   <url><loc>https://learn.heraklion-bridge.gr/quiz/vasika-tou-mpritz/</loc></url>
   <url><loc>https://learn.heraklion-bridge.gr/quiz/kanones-agoras/</loc></url>
   <url><loc>https://learn.heraklion-bridge.gr/quiz/epilogi-symvolaiou/</loc></url>
