@@ -95,6 +95,7 @@ var DEFAULTS = {
   var MAX_CUSTOM = 30;
   var root = document.getElementById('cc');
   var state = {};          // id -> κείμενο, 'c:<σύμβαση>' -> '1'/'', 'n:<σύμβαση>' -> σημείωση, 'custom' -> JSON λίστα, 'notes' -> σημειώσεις
+  var backup;              // υπενθύμιση αντιγράφου ασφαλείας (assets/backup.js)
   var shared = false;      // true όταν βλέπουμε κάρτα από σύνδεσμο (δεν αποθηκεύεται αυτόματα)
 
   /* ---------- βοηθητικά ---------- */
@@ -151,6 +152,7 @@ var DEFAULTS = {
 
   /* ---------- αποθήκευση ---------- */
   function save() {
+    if (backup) backup.changed();
     if (shared) return;
     try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) { /* ιδιωτική περιήγηση: δεν πειράζει */ }
   }
@@ -427,6 +429,7 @@ var DEFAULTS = {
     var a = el('a', { href: URL.createObjectURL(blob), download: 'karta-symvaseon.json' });
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
+    if (backup) backup.exported();
   }
   function openFile(file) {
     var r = new FileReader();
@@ -472,6 +475,11 @@ var DEFAULTS = {
     if (m) { try { fromLink = clean(JSON.parse(fromB64(m[1]))); } catch (e) { fromLink = null; } }
     if (fromLink && !isEmpty(fromLink)) { state = fromLink; shared = true; } else { state = loadLocal(); }
 
+    backup = HBBackup.create({
+      key: 'hbc-convention-card-v1-exp',
+      get: function () { return JSON.stringify(state); }, empty: function () { return isEmpty(state); },
+      download: download, skip: function () { return shared; }
+    });
     var fileIn = el('input', { type: 'file', accept: '.json,application/json', hidden: '' });
     fileIn.addEventListener('change', function () { if (fileIn.files[0]) openFile(fileIn.files[0]); fileIn.value = ''; });
 
@@ -499,6 +507,7 @@ var DEFAULTS = {
     root.appendChild(el('p', { class: 'meta cc-hint', text: 'Τα στοιχεία αποθηκεύονται αυτόματα σε αυτή τη συσκευή και δεν στέλνονται πουθενά. Για να τα έχετε αλλού, κατεβάστε το αρχείο ή στείλτε τον σύνδεσμο.' }));
     root.appendChild(HBSuits.help());
     root.appendChild(banner);
+    root.appendChild(backup.el);
     root.appendChild(actions);
     root.appendChild(buildForm());
     root.appendChild(el('h2', { class: 'cc-preview-title', text: 'Προεπισκόπηση κάρτας' }));
@@ -507,6 +516,7 @@ var DEFAULTS = {
     HBSuits.init(root);
     fill();
     setBanner(shared);
+    backup.start();
   }
   if (root) init();
 })();

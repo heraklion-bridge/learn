@@ -4,7 +4,7 @@ Learning material of the Heraklion Bridge Club (Όμιλος Μπριτζ Ηρα
 
 ## Contents
 
-The site has a left icon rail (home, Μαθήματα, Quiz, Για παίκτες, club site), white cards on an off-white background, and a «Υλικό» sidebar with counts and search on every page. The look follows the bridgetricks.com resource pages.
+The site has a left icon rail (home, Μαθήματα, Quiz, Για παίκτες, club site), white cards on an off-white background, and a «Υλικό» sidebar with counts and search on every page.
 
 | URL | What | Files |
 |---|---|---|
@@ -36,6 +36,7 @@ Shared parts: `assets/site.js` (rail, «Υλικό» sidebar, search, footer: **
   Shortcuts while viewing: arrows/Space = next/previous, **Esc** = overview, **F** = full screen, **?** = help; add `?print-pdf` to the address to print or save as PDF.
 - **Convention card fields:** the form fields, the list of conventions and the «τυπικές τιμές» (defaults) are the `SECTIONS`, `CONV_GROUPS` and `DEFAULTS` lists at the top of `paiktes/karta-symvaseon/convention-card.js`.
 - **Suit symbols:** `assets/suits.js` gives the card and the systems tool a small palette (♠ ♥ ♦ ♣ NT) under the focused text field, Greek replacement by the first two letters plus a space (σπ ♣, κα ♦, κο ♥, μπ ♠, χα/ντ NT, πα PASS), the English `!s !h !d !c`, and quick bids such as `1s` → 1♠ in the «Δήλωση» field of Συστήματα, and `HBSuits.help()`: one short line plus a hidden «?» with detailed examples.
+- **Backup reminder and undo:** `assets/backup.js` shows a notice with «Λήψη αρχείου» when changes exist that were never downloaded as a file (data lives only in the browser); the systems tool also has «Αναίρεση / Επανάληψη».
 - **PDF:** the card and the systems tool build their PDFs in the browser with `assets/pdf.js` (jsPDF and a DejaVu Sans subset in `assets/vendor/pdf/`, loaded only when a PDF is requested).
 
 ## Preview on your computer

@@ -7,7 +7,7 @@
 
    Μοντέλο: { name, nodes: [ { b: δήλωση, m: σημασία, k: 1 αν είναι μαζεμένος ο κλάδος, c: [παιδιά] } ] }
    Κάθε κόμβος είναι μια δήλωση· η διαδρομή από την κορυφή ως αυτόν είναι η ακολουθία της αγοράς.
-   Οι αντίπαλοι θεωρούνται πάσο, εκτός αν γράψετε τη δήλωσή τους σε παρένθεση, π.χ. (1♠).
+   Οι αντίπαλοι θεωρούνται PASS, εκτός αν γράψετε τη δήλωσή τους σε παρένθεση, π.χ. (1♠).
    ========================================================================== */
 (function () {
   'use strict';
@@ -22,6 +22,8 @@
   var view = 'tree';       // 'tree' | 'table'
   var editing = null, editingArr = null;   // ο κόμβος που επεξεργαζόμαστε και η λίστα που τον περιέχει
   var ui = {};
+  var backup;              // υπενθύμιση αντιγράφου ασφαλείας (assets/backup.js)
+  var undoStack = [], redoStack = [], lastSnap = '', lastChangeAt = 0;   // ιστορικό για «Αναίρεση» / «Επανάληψη»
 
   /* Το σύστημα που διδάσκονται οι μαθητές (κουμπί «Σύστημα μαθητών»). Τα ανοίγματα 1NT και 1 σε χρώμα είναι από τις
      διαφάνειες των ενοτήτων 04, 06 και 08 (πρώτος κύκλος). Τα weak two με 2NT feature ask και το 2♣ προστέθηκαν
@@ -179,9 +181,47 @@
   function fromB64(s) { s = s.replace(/-/g, '+').replace(/_/g, '/'); while (s.length % 4) s += '='; return decodeURIComponent(escape(atob(s))); }
 
   /* ---------- αποθήκευση ---------- */
-  function save() {
+  function snap() { return JSON.stringify(data); }
+  function track() {                     // ιστορικό αλλαγών: μια ριπή πληκτρολόγησης γίνεται μία αναίρεση
+    var cur = snap();
+    if (cur === lastSnap) return;
+    var now = Date.now();
+    if (now - lastChangeAt > 1200 || !undoStack.length) {
+      undoStack.push(lastSnap);
+      if (undoStack.length > 60) undoStack.shift();
+    }
+    lastChangeAt = now; lastSnap = cur; redoStack = [];
+    updateUndo();
+  }
+  function persist() {
     if (shared) return;
-    try { localStorage.setItem(KEY, JSON.stringify(data)); } catch (e) { /* ιδιωτική περιήγηση: δεν πειράζει */ }
+    try { localStorage.setItem(KEY, snap()); } catch (e) { /* ιδιωτική περιήγηση: δεν πειράζει */ }
+  }
+  function save() {
+    track();
+    persist();
+    if (backup) backup.changed();
+  }
+  function restore(str) {                // γυρίζει σε προηγούμενη κατάσταση χωρίς να την ξαναγράφει στο ιστορικό
+    data = clean(JSON.parse(str)); editing = null; editingArr = null;
+    lastSnap = snap(); lastChangeAt = 0;
+    persist();
+    if (backup) backup.changed();
+    refresh(); updateUndo();
+  }
+  function undo() {
+    if (!undoStack.length) return;
+    redoStack.push(lastSnap);
+    restore(undoStack.pop());
+  }
+  function redo() {
+    if (!redoStack.length) return;
+    undoStack.push(lastSnap);
+    restore(redoStack.pop());
+  }
+  function updateUndo() {
+    if (ui.undo) ui.undo.disabled = !undoStack.length;
+    if (ui.redo) ui.redo.disabled = !redoStack.length;
   }
   function loadLocal() {
     try { return clean(JSON.parse(localStorage.getItem(KEY) || '{}')); } catch (e) { return clean({}); }
@@ -356,12 +396,12 @@
       var lines = Math.max(sl.length, ml.length, 1), lh = P.lineH(FS), h = lines * lh + 2.6;
       if (y + h > PH - M) { doc.addPage(); y = M; colHeads(); }
       if (r.depth === 0 && idx > 0) { doc.setDrawColor.apply(doc, GREEN); doc.setLineWidth(0.35); doc.line(M, y, PW - M, y); }
-      else { doc.setDrawColor(215, 224, 219); doc.setLineWidth(0.15); doc.line(M, y, PW - M, y); }
+      else { doc.setDrawColor(214, 225, 234); doc.setLineWidth(0.15); doc.line(M, y, PW - M, y); }
       sl.forEach(function (l, i) { P.draw(l, M, y + 1.3 + (i + 1) * lh - 1.1, FS, INK); });
       ml.forEach(function (l, i) { P.draw(l, M + SEQ + GAP, y + 1.3 + (i + 1) * lh - 1.1, FS, INK); });
       y += h;
     });
-    doc.setDrawColor(215, 224, 219); doc.setLineWidth(0.15); doc.line(M, y, PW - M, y);
+    doc.setDrawColor(214, 225, 234); doc.setLineWidth(0.15); doc.line(M, y, PW - M, y);
     return doc;
   }
   function downloadPdf(b) {
@@ -404,6 +444,7 @@
     var a = el('a', { href: URL.createObjectURL(blob), download: 'systima.json' });
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
+    if (backup) backup.exported();
   }
   function openFile(file) {
     var r = new FileReader();
@@ -436,6 +477,7 @@
   function clearAll() {
     if (!window.confirm('Να διαγραφεί το σύστημα από αυτή τη συσκευή;')) return;
     data = { name: '', nodes: [] }; editing = null; leaveShared();
+    track();
     try { localStorage.removeItem(KEY); } catch (e) { /* τίποτα */ }
     refresh();
   }
@@ -447,6 +489,11 @@
     if (m) { try { fromLink = clean(JSON.parse(fromB64(m[1]))); } catch (e) { fromLink = null; } }
     if (fromLink && !isEmpty(fromLink)) { data = fromLink; shared = true; } else { data = loadLocal(); }
 
+    backup = HBBackup.create({
+      key: 'hbc-system-v1-exp',
+      get: snap, empty: function () { return isEmpty(data); },
+      download: download, skip: function () { return shared; }
+    });
     var fileIn = el('input', { type: 'file', accept: '.json,application/json', hidden: '' });
     fileIn.addEventListener('change', function () { if (fileIn.files[0]) openFile(fileIn.files[0]); fileIn.value = ''; });
 
@@ -478,13 +525,17 @@
     ui.tabTree.addEventListener('click', function () { setView('tree'); });
     ui.tabTable.addEventListener('click', function () { setView('table'); });
     ui.count = el('span', { class: 'meta sy-count' });
+    ui.undo = btn('↶ Αναίρεση', undo, 'btn btn--outline sy-small');
+    ui.redo = btn('↷ Επανάληψη', redo, 'btn btn--outline sy-small');
+    ui.undo.disabled = true; ui.redo.disabled = true;
     ui.tree = el('div', { class: 'sy-tree' });
     ui.sheet = el('article', { class: 'sy-sheet', 'aria-label': 'Το σύστημα ως πίνακας' });
     ui.toast = el('div', { id: 'cc-toast', class: 'cc-toast', role: 'status', hidden: '' });
 
     var nameBox = el('div', { class: 'cc-field sy-name' }, [el('label', { for: 'sy-name', text: 'Όνομα συστήματος' }), ui.name]);
     var tabsBar = el('div', { class: 'sy-bar sy-bar-top' }, [
-      el('div', { class: 'sy-tabs', role: 'group', 'aria-label': 'Προβολή' }, [ui.tabTree, ui.tabTable]), ui.count
+      el('div', { class: 'sy-tabs', role: 'group', 'aria-label': 'Προβολή' }, [ui.tabTree, ui.tabTable]), ui.count,
+      el('span', { class: 'sy-bar-r' }, [ui.undo, ui.redo])
     ]);
     ui.treeWrap = el('div', { class: 'sy-tree-wrap' }, [
       el('div', { class: 'sy-bar-r2' }, [
@@ -496,12 +547,12 @@
 
     var uiBox = el('div', { class: 'sy-ui' }, [
       el('p', { class: 'meta cc-hint', text: 'Τα στοιχεία αποθηκεύονται αυτόματα σε αυτή τη συσκευή και δεν στέλνονται πουθενά. Για να τα έχετε και αλλού, χρησιμοποιήστε «Λήψη αρχείου» ή «Σύνδεσμος κοινοποίησης».' }),
-      el('p', { class: 'meta cc-hint', text: 'Κάθε δήλωση έχει από κάτω της τις απαντήσεις: με το ＋ προσθέτετε απάντηση, με το ✎ αλλάζετε τη δήλωση ή τη σημασία της. Η ακολουθία διαβάζεται από πάνω προς τα κάτω. Οι αντίπαλοι θεωρούνται πάσο, εκτός αν γράψετε τη δήλωσή τους σε παρένθεση, π.χ. (1♠).' }),
+      el('p', { class: 'meta cc-hint', text: 'Κάθε δήλωση έχει από κάτω της τις απαντήσεις: με το ＋ προσθέτετε απάντηση, με το ✎ αλλάζετε τη δήλωση ή τη σημασία της. Η ακολουθία διαβάζεται από πάνω προς τα κάτω. Οι αντίπαλοι θεωρούνται PASS, εκτός αν γράψετε τη δήλωσή τους σε παρένθεση, π.χ. (1♠).' }),
       HBSuits.help([
         'Στο πεδίο της δήλωσης αρκεί το επίπεδο και το χρώμα: 1σπ → 1♣, 2κα → 2♦, 3κο → 3♥, 4μπ → 4♠, 3χα → 3NT (πάντα με κενό στο τέλος).',
         'Στο πεδίο της δήλωσης δουλεύουν και αμέσως τα αγγλικά: 1s → 1♠, 2h → 2♥, 3d → 3♦, 4c → 4♣, 1nt → 1NT.'
       ]),
-      ui.banner, actions, nameBox, tabsBar, ui.treeWrap
+      ui.banner, backup.el, actions, nameBox, tabsBar, ui.treeWrap
     ]);
     root.appendChild(uiBox);
     root.appendChild(ui.sheet);
@@ -514,6 +565,8 @@
     renderTree();
     renderSheet();
     ui.banner.hidden = !shared;
+    lastSnap = snap(); undoStack = []; redoStack = []; updateUndo();
+    backup.start();
   }
   init();
 })();

@@ -69,6 +69,9 @@ def check_unit(slug):
     bad = find(r'(?<![A-Za-zΑ-Ωα-ωΆ-ώ])(?:ΧΑ|XA|ΧA|XΑ|ΝΤ|NΤ|ΝT)(?![A-Za-zΑ-Ωα-ωΆ-ώ])', whole)
     report(not bad, 'notrump written NT (Latin letters), not ΧΑ / ΝΤ', ' | '.join(bad))
 
+    bad = find(r'\b[Ππ]άσο\b', whole)
+    report(not bad, 'the call is written PASS, not «πάσο»', ' | '.join(bad))
+
     # 3. Greek grammar of bids and of μανς / λεβέ / αντάμ
     g = []
     for name, pat in [

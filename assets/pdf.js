@@ -45,7 +45,7 @@ window.HBPDF = (function () {
     doc.addFileToVFS('DejaVuSans-Bold.ttf', fonts.bold);
     doc.addFont('DejaVuSans.ttf', 'DejaVu', 'normal');
     doc.addFont('DejaVuSans-Bold.ttf', 'DejaVu', 'bold');
-    var C = { GREEN: [35, 92, 64], MUTED: [107, 122, 114], RED: [198, 40, 40], INK: [20, 28, 24] };
+    var C = { GREEN: [11, 74, 123], MUTED: [94, 117, 135], RED: [198, 40, 40], INK: [20, 40, 59] };
     var PT = 0.3528;                    // 1 pt σε mm
 
     function setFont(bold, size) { doc.setFont('DejaVu', bold ? 'bold' : 'normal'); doc.setFontSize(size); }
