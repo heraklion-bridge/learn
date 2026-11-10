@@ -49,9 +49,9 @@ const SITE = {
     ]
   },
 
-  /* ----- Συμβάσεις: ομάδες συμβάσεων και οι σελίδες τους (symvaseis/<ομάδα>/<σύμβαση>/) ----- */
+  /* ----- Συμβάσεις (υπομενού του «Για παίκτες»): ομάδες συμβάσεων και οι σελίδες τους (paiktes/symvaseis/<ομάδα>/<σύμβαση>/) ----- */
   conventions: {
-    label: 'Συμβάσεις', dir: 'symvaseis/',
+    label: 'Συμβάσεις', dir: 'paiktes/symvaseis/',
     groups: [
       {
         slug: 'meta-anoigma-1nt', label: 'Μετά από άνοιγμα 1NT',
@@ -69,8 +69,7 @@ const SITE = {
     { id: 'home', label: 'Αρχική', href: '', icon: 'spade' },
     { id: 'lectures', label: 'Μαθήματα', href: 'lectures/', icon: 'book' },
     { id: 'quiz', label: 'Quiz', href: 'quiz/', icon: 'check' },
-    { id: 'paiktes', label: 'Για παίκτες', href: 'paiktes/', icon: 'users' },
-    { id: 'symvaseis', label: 'Συμβάσεις', href: 'symvaseis/', icon: 'tree' }
+    { id: 'paiktes', label: 'Για παίκτες', href: 'paiktes/', icon: 'users' }
   ],
   club: { label: 'Σελίδα Ομίλου', href: 'https://www.heraklion-bridge.gr/' },
 
@@ -166,13 +165,14 @@ const SITE = {
       var cur = here === href;
       return '<div class="side-group"><div class="side-row' + (cur ? ' current' : '') + '"><span class="chev-btn"></span><a class="lbl" href="' + esc(url(href)) + '"' + (cur ? ' aria-current="page"' : '') + '>' + esc(pg.title) + '</a></div></div>';
     }).join('');
-    var total = pl.sections.reduce(function (n, sec) { return n + sec.items.length; }, 0) + pl.pages.length;
+    nest += conventionsGroup();
+    var total = pl.sections.reduce(function (n, sec) { return n + sec.items.length; }, 0) + pl.pages.length + 1;
     return '<div class="side-group' + (open ? ' open' : '') + '">' + row(pl.dir, pl.label, total, here === pl.dir, open) + '<div class="side-nest">' + nest + '</div></div>';
   }
 
   function conventionsGroup() {
     var cv = SITE.conventions;
-    var open = current === 'symvaseis';
+    var open = here.indexOf(cv.dir) === 0;
     var nest = cv.groups.map(function (g) {
       var gHref = cv.dir + g.slug + '/';
       var gOpen = here.indexOf(gHref) === 0;
@@ -208,7 +208,6 @@ const SITE = {
     aside.innerHTML =
       '<nav class="side-card" aria-label="Υλικό"><h2>Υλικό</h2>' + groups +
         playersGroup() +
-        conventionsGroup() +
       '</nav>' +
       '<div class="side-search" role="search">' + svg('search', 'ico-lg') +
         '<input type="search" placeholder="Αναζήτηση" aria-label="Αναζήτηση στο υλικό" autocomplete="off">' +
@@ -314,7 +313,7 @@ const SITE = {
       if (crumbs) head.appendChild(crumbs);
       var icon = document.createElement('span');
       icon.className = 'page-icon';
-      icon.innerHTML = svg({ home: 'spade', lectures: 'book', quiz: 'check', paiktes: 'users', symvaseis: 'tree' }[current] || 'spade');
+      icon.innerHTML = svg(here.indexOf(SITE.conventions.dir) === 0 ? 'tree' : { home: 'spade', lectures: 'book', quiz: 'check', paiktes: 'users' }[current] || 'spade');
       head.appendChild(icon);
       head.appendChild(h1);
       inner.appendChild(head);
