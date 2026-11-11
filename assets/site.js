@@ -57,7 +57,7 @@ const SITE = {
         slug: 'meta-anoigma-1nt', label: 'Μετά από άνοιγμα 1NT',
         items: [
           { slug: 'stayman', title: 'Stayman', kw: 'stayman 2♣ 4φ τετράφυλλο μαζέρ απάντηση 1NT συμβατική' },
-          { slug: 'jacoby-transfer', title: '2♦/♥ Jacoby transfer', kw: 'jacoby transfer μεταφορά 2♦ 2♥ 5φ πεντάφυλλο μαζέρ 1NT συμβατική' },
+          { slug: 'jacoby-transfer', title: 'Jacoby transfer', kw: 'jacoby transfer μεταφορά 2♦ 2♥ 5φ πεντάφυλλο μαζέρ 1NT συμβατική' },
           { slug: 'lebensohl', title: 'Lebensohl', kw: 'lebensohl lebenshol παρεμβολή παρέμβαση επέμβαση αντίπαλοι 2NT 3♣ στοπ cue bid 1NT συμβατική' }
         ]
       }
@@ -72,6 +72,7 @@ const SITE = {
     { id: 'paiktes', label: 'Για παίκτες', href: 'paiktes/', icon: 'users' }
   ],
   club: { label: 'Σελίδα Ομίλου', href: 'https://www.heraklion-bridge.gr/' },
+  themeLabel: 'Σκούρο θέμα',
 
   /* ----- Υποσέλιδο ----- */
   footer: {
@@ -113,6 +114,8 @@ const SITE = {
     out: '<path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>',
     search: '<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',
     tree: '<circle cx="6" cy="6" r="2.5"/><circle cx="6" cy="18" r="2.5"/><circle cx="18" cy="12" r="2.5"/><path d="M6 8.5v7M8.5 6H12a4 4 0 0 1 4 4v.5M8.5 18H12a4 4 0 0 0 4-4v-.5"/>',
+    moon: '<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>',
+    sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
     chev: '<path d="m9 18 6-6-6-6"/>'
   };
   function svg(name, cls) {
@@ -125,6 +128,20 @@ const SITE = {
   function num(i) { return (i < 9 ? '0' : '') + (i + 1); }
   function plain(s) { return s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/ς/g, 'σ'); }
 
+  /* ----- θέμα (φωτεινό / σκούρο): η επιλογή αποθηκεύεται στη συσκευή· αν δεν έχει γίνει επιλογή, ακολουθεί τη συσκευή ----- */
+  function currentTheme() {
+    var t = document.documentElement.getAttribute('data-theme');
+    if (t) return t;
+    try { t = localStorage.getItem('theme'); } catch (e) {}
+    return t === 'dark' || t === 'light' ? t : (window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  }
+  function applyTheme(t) {
+    document.documentElement.setAttribute('data-theme', t);
+    var b = document.querySelector('.theme-btn');
+    if (b) b.setAttribute('aria-pressed', t === 'dark' ? 'true' : 'false');
+  }
+  applyTheme(currentTheme());
+
   /* ----- μπάρα εικονιδίων ----- */
   function buildRail() {
     var links = SITE.rail.map(function (r) {
@@ -136,6 +153,8 @@ const SITE = {
     rail.setAttribute('aria-label', 'Κύριο μενού');
     rail.innerHTML =
       links + '<span class="spacer"></span>' +
+      '<button type="button" class="rail-link theme-btn" aria-label="' + esc(SITE.themeLabel) + '" aria-pressed="' + (currentTheme() === 'dark') + '">' +
+        svg('moon').replace('<svg class="', '<svg class="i-moon ') + svg('sun').replace('<svg class="', '<svg class="i-sun ') + '<span class="tip">' + esc(SITE.themeLabel) + '</span></button>' +
       '<a class="rail-link club" href="' + esc(SITE.club.href) + '" aria-label="' + esc(SITE.club.label) + '"><img src="' + esc(url('assets/img/logo.png')) + '" width="34" height="34" alt=""><span class="tip">' + esc(SITE.club.label) + '</span></a>';
     return rail;
   }
@@ -173,17 +192,14 @@ const SITE = {
   function conventionsGroup() {
     var cv = SITE.conventions;
     var open = here.indexOf(cv.dir) === 0;
-    var nest = cv.groups.map(function (g) {
-      var gHref = cv.dir + g.slug + '/';
-      var gOpen = here.indexOf(gHref) === 0;
-      var items = g.items.map(function (it, i) {
-        var href = gHref + it.slug + '/';
-        return '<li><a href="' + esc(url(href)) + '"' + (here === href ? ' class="current" aria-current="page"' : '') + '><b>' + num(i) + '</b> ' + esc(it.title) + '</a></li>';
+    var i = 0;
+    var items = cv.groups.map(function (g) {   // οι ομάδες φαίνονται μόνο στη σελίδα της λίστας· εδώ οι συμβάσεις είναι μία λίστα
+      return g.items.map(function (it) {
+        var href = cv.dir + g.slug + '/' + it.slug + '/';
+        return '<li><a href="' + esc(url(href)) + '"' + (here === href ? ' class="current" aria-current="page"' : '') + '><b>' + num(i++) + '</b> ' + esc(it.title) + '</a></li>';
       }).join('');
-      return '<div class="side-group' + (gOpen ? ' open' : '') + '">' + row(gHref, g.label, g.items.length, here === gHref, gOpen) + '<ul class="side-sub">' + items + '</ul></div>';
     }).join('');
-    var total = cv.groups.reduce(function (n, g) { return n + g.items.length; }, 0);
-    return '<div class="side-group' + (open ? ' open' : '') + '">' + row(cv.dir, cv.label, total, here === cv.dir, open) + '<div class="side-nest">' + nest + '</div></div>';
+    return '<div class="side-group' + (open ? ' open' : '') + '">' + row(cv.dir, cv.label, i, here === cv.dir, open) + '<ul class="side-sub">' + items + '</ul></div>';
   }
 
   function buildSide() {
@@ -333,6 +349,11 @@ const SITE = {
     skip.textContent = 'Μετάβαση στο περιεχόμενο';
     document.body.insertBefore(skip, document.body.firstChild);
     document.body.insertBefore(buildRail(), skip.nextSibling);
+    document.querySelector('.theme-btn').addEventListener('click', function () {
+      var t = currentTheme() === 'dark' ? 'light' : 'dark';
+      applyTheme(t);
+      try { localStorage.setItem('theme', t); } catch (e) {}
+    });
     document.body.classList.add('ready');
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
